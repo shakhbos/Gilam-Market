@@ -21,6 +21,11 @@ interface Props {
   locale: string;
   product: QrBaseProduct;
   relatedProducts: QrBaseProduct[];
+  /**
+   * SSR paytida `/currency` public endpoint'idan olingan joriy USD → UZS kursi.
+   * Narx hisoblash: market_priceMeter_usd × kv × usdRate.
+   */
+  usdRate: number;
 }
 
 const breakpointColumnsObj = {
@@ -52,7 +57,7 @@ type MediaItem = {
   thumb: string;
 };
 
-export default function GlamById({ product, relatedProducts }: Props) {
+export default function GlamById({ product, relatedProducts, usdRate }: Props) {
   const t = useTranslations("Product");
   const [tab, setTab] = useState<1 | 2>(1);
 
@@ -111,22 +116,47 @@ export default function GlamById({ product, relatedProducts }: Props) {
   const isInCart = buskets.some((b) => b.id === product.id);
   const isLiked = likes.some((l) => l.id === product.id);
 
+  // Narx admin /price sahifasidan I-Manager kiritgan qiymatga bog'liq:
+  //   collection_prices[type='market'].priceMeter — USD/m²
+  //   total_uzs = priceMeter × kv × usdRate
+  // usdRate SSR paytida /currency (public) endpoint'idan olinadi.
+  const marketPriceUsd = (() => {
+    const prices = product.collection?.collection_prices ?? [];
+    return Number(prices.find((p) => p.type === "market")?.priceMeter || 0);
+  })();
+  const priceForSize = (sX?: number, sY?: number) => {
+    const kv = Number(sX ?? 0) * Number(sY ?? 0);
+    return marketPriceUsd * kv * usdRate;
+  };
+  const mainPriceUzs = priceForSize(product.size?.x, product.size?.y);
+  const uzsFormatter = new Intl.NumberFormat("ru-RU");
+
   // Chip → cart item: joriy product'ning umumiy fieldlarini (collection,
   // model, imgUrl, i_price...) ko'chirib, faqat id + size + stock aynan
   // shu chip'ga tegishli qilib almashtiramiz. Shu tariqa siblinglar
   // uchun sotib olish ma'lumotlari to'liq bo'ladi.
-  const chipToCartItem = (s: GroupSize) => ({
-    ...product,
-    id: s.qrBaseId || product.id,
-    size: {
-      ...(product.size ?? {}),
-      id: s.id,
-      x: s.x,
-      y: s.y,
-      title: `${Math.round(s.x * 100)}x${Math.round(s.y * 100)}`,
-    } as QrBaseProduct["size"],
-    stock_this_size: s.count,
-  });
+  const chipToCartItem = (s: GroupSize) => {
+    const kv = Number(s.x || 0) * Number(s.y || 0);
+    // i_price maydonini "narx per m²" so'mda saqlaymiz — savatcha kartochkasi
+    // va order servisi bir xil formula ishlatadi: i_price × count × size.kv.
+    // Bu bilan admin narxi (USD) foydalanuvchi ko'radigan so'm summasiga mos
+    // bo'ladi.
+    const pricePerM2Uzs = marketPriceUsd * usdRate;
+    return {
+      ...product,
+      id: s.qrBaseId || product.id,
+      size: {
+        ...(product.size ?? {}),
+        id: s.id,
+        x: s.x,
+        y: s.y,
+        kv,
+        title: `${Math.round(s.x * 100)}x${Math.round(s.y * 100)}`,
+      } as QrBaseProduct["size"],
+      i_price: pricePerM2Uzs,
+      stock_this_size: s.count,
+    };
+  };
 
   const isSizeInCart = (s: GroupSize) => {
     const id = s.qrBaseId || product.id;
@@ -195,10 +225,25 @@ export default function GlamById({ product, relatedProducts }: Props) {
   }, [loadMore]);
 
   const toggleCart = () => {
+    // Legacy product.i_price stale bo'lishi mumkin (backend qo'lda yozgan
+    // eski qiymatlar). Cart uchun UZS-per-m² qayta hisoblanadi va size.kv
+    // majburiy o'rnatiladi — busket kartochkasi va order servisi mos
+    // formula ishlatadi.
+    const pricePerM2Uzs = marketPriceUsd * usdRate;
+    const cartProduct = {
+      ...product,
+      i_price: pricePerM2Uzs,
+      size: {
+        ...(product.size ?? {}),
+        kv:
+          Number(product.size?.kv || 0) ||
+          Number(product.size?.x || 0) * Number(product.size?.y || 0),
+      } as QrBaseProduct["size"],
+    };
     dispatch(
       isInCart
         ? changeBuskets(buskets.filter((it) => it.id !== product.id))
-        : changeBuskets([product, ...buskets]),
+        : changeBuskets([cartProduct, ...buskets]),
     );
   };
   const toggleLike = () => {
@@ -318,7 +363,7 @@ export default function GlamById({ product, relatedProducts }: Props) {
               className="text-[20px] lg:text-[24px] leading-[24px] lg:leading-[26px] font-medium text-[#212121]"
               aria-label={t("priceLabel")}
             >
-              {Number(product.i_price ?? 0).toLocaleString()} sum
+              {uzsFormatter.format(Math.round(mainPriceUzs))} sum
             </p>
           </div>
 
@@ -336,6 +381,7 @@ export default function GlamById({ product, relatedProducts }: Props) {
                   const label = `${Math.round(Number(s.x || 0) * 100)}x${Math.round(Number(s.y || 0) * 100)}`;
                   const inCart = isSizeInCart(s);
                   const disabled = !s.qrBaseId;
+                  const uzs = priceForSize(s.x, s.y);
                   return (
                     <button
                       key={s.id}
@@ -343,19 +389,30 @@ export default function GlamById({ product, relatedProducts }: Props) {
                       onClick={() => toggleSize(s)}
                       disabled={disabled}
                       aria-pressed={inCart}
-                      title={t("inStock", { count: s.count })}
-                      className={`px-3 py-2 rounded-[5px] text-[14px] lg:text-[16px] inline-flex items-center gap-2 transition-colors border ${
+                      title={`${t("inStock", { count: s.count })} · ${uzsFormatter.format(Math.round(uzs))} sum`}
+                      className={`px-3 py-2 rounded-[5px] text-[14px] lg:text-[16px] inline-flex flex-col items-start gap-[2px] transition-colors border ${
                         inCart
                           ? "bg-[#121212] text-white border-[#121212]"
                           : "bg-[#F4F4F4] text-[#212121] border-transparent hover:border-[#121212]"
                       } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                     >
-                      <span>{label}</span>
-                      <span
-                        className={`text-[12px] ${inCart ? "text-white/70" : "text-[#6B6B6B]"}`}
-                      >
-                        ({s.count})
+                      <span className="flex items-center gap-2">
+                        <span>{label}</span>
+                        <span
+                          className={`text-[12px] ${inCart ? "text-white/70" : "text-[#6B6B6B]"}`}
+                        >
+                          ({s.count})
+                        </span>
                       </span>
+                      {uzs > 0 && (
+                        <span
+                          className={`text-[12px] leading-none ${
+                            inCart ? "text-white/80" : "text-[#525252]"
+                          }`}
+                        >
+                          {uzsFormatter.format(Math.round(uzs))} sum
+                        </span>
+                      )}
                     </button>
                   );
                 })}

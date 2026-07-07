@@ -29,6 +29,22 @@ const getSingleProduct = cache(
 );
 
 /**
+ * Joriy USD → UZS kursi. Backend /currency public endpoint'idan oxirgi
+ * yozuvni oladi (format: {items: [{usd, uzs}]}, ular buffer nusxa: 100$ = X so'm).
+ * usdRate = uzs / usd.
+ */
+const getUsdRate = cache(async (): Promise<number> => {
+  const res = await fetchData<{ items?: Array<{ usd?: string | number; uzs?: string | number }> }>(
+    `${process.env.NEXT_PUBLIC_URL}/currency`,
+    { limit: 1, page: 1 },
+  );
+  const item = res?.items?.[0];
+  const usd = Number(item?.usd || 0);
+  const uzs = Number(item?.uzs || 0);
+  return usd > 0 ? uzs / usd : 0;
+});
+
+/**
  * "Shu mahsulotdan boshqa" — o'xshash productlarni katalog qidiruvi orqali
  * olamiz. Backend `productId` param'ini ignore qiladi (whitelist uchun kerak),
  * ishlaydigan filter — `search` (multi-word).
@@ -118,9 +134,10 @@ export default async function GilamById({
   const { id, locale } = await params;
   const sp = await searchParams;
 
-  const [product, t] = await Promise.all([
+  const [product, t, usdRate] = await Promise.all([
     getSingleProduct(id),
     getTranslations({ locale, namespace: "Layout" }),
+    getUsdRate(),
   ]);
 
   if (!product) {
@@ -188,7 +205,13 @@ export default async function GilamById({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <BreadcrumbSchema items={breadcrumbItems} />
-      <GlamById id={id} locale={locale} product={product} relatedProducts={related} />
+      <GlamById
+        id={id}
+        locale={locale}
+        product={product}
+        relatedProducts={related}
+        usdRate={usdRate}
+      />
     </>
   );
 }
