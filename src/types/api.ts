@@ -82,6 +82,12 @@ export interface QrBaseProduct {
   factory?: NamedEntity | null;
 
   sizes?: GroupSize[];
+  /**
+   * `/qr-base/i-market` list endpoint har item uchun shu QrBase
+   * guruhidagi aktiv o'lchamlar (kartochkada diapazon ko'rsatish uchun).
+   * Formati: `[{x, y, count}]`, x va y — metrda.
+   */
+  group_sizes?: Array<{ x: number; y: number; count: number }>;
   total_count?: number;
   /**
    * `/qr-base/i-market/:id` includeGroupSizes bilan qaytaradi — aynan
