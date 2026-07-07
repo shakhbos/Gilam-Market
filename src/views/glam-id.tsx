@@ -164,6 +164,10 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
   // bosish tanlashni bekor qiladi. Faqat 1 ta o'lcham mavjud bo'lsa avtomatik
   // tanlanadi (useEffect quyida).
   const [selectedSizeId, setSelectedSizeId] = useState<string | null>(null);
+  // Foydalanuvchi hech qanday chip tanlamay tugmani bossa — chipni orange
+  // border bilan yoritamiz (attention seeker) va toast'da ogohlantiramiz.
+  // Chip tanlanishi bilan highlight avtomatik o'chadi.
+  const [highlightChips, setHighlightChips] = useState(false);
 
   useEffect(() => {
     const active = sizes.filter((s) => Number(s.count) > 0 && !!s.qrBaseId);
@@ -181,6 +185,7 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
 
   const selectSize = (s: GroupSize) => {
     if (!s.qrBaseId) return;
+    setHighlightChips(false);
     setSelectedSizeId((cur) => (cur === s.id ? null : s.id));
   };
 
@@ -241,7 +246,12 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
     //      (chip va tugma yana kulrang holatga qaytadi).
     //   2) Sizes yo'q (legacy fallback) — butun productni toggle qilamiz.
     if (sizes.length > 0) {
-      if (!selectedSize) return; // tugma disabled bo'lishi kerak edi
+      if (!selectedSize) {
+        // Tanlanmagan: ogohlantirish + chiplarni orange border bilan yoritish
+        setHighlightChips(true);
+        toast.warning(t("selectSizeFirst"));
+        return;
+      }
       const item = chipToCartItem(selectedSize);
       // Duplikat oldini olish: agar shu qrBaseId cartda bor bo'lsa, faqat
       // selectionni tozalaymiz (miqdorni oshirish cart sahifasidan bo'ladi).
@@ -419,7 +429,9 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
                       className={`px-3 py-2 rounded-[5px] text-[14px] lg:text-[16px] inline-flex items-center gap-2 transition-colors border ${
                         isSelected
                           ? "bg-[#121212] text-white border-[#121212]"
-                          : "bg-[#F4F4F4] text-[#212121] border-transparent hover:border-[#121212]"
+                          : highlightChips
+                            ? "bg-[#F4F4F4] text-[#212121] border-[#F97316] animate-pulse"
+                            : "bg-[#F4F4F4] text-[#212121] border-transparent hover:border-[#121212]"
                       } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                     >
                       <span>{label}</span>
@@ -496,31 +508,32 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
           {/*
               Cart tugmasi ACTIVE bo'ladi qachonki: (a) sizes ro'yxati bor va
               foydalanuvchi chip tanlagan, YOKI (b) sizes yo'q (legacy) va
-              product hozircha cartda emas. Aks holda tugma o'chiq (kul rang)
-              va bosilmaydi. Tanlash o'chgan hamono tugma yana kul rangga
-              qaytadi — foydalanuvchi qayta tanlashi kerak.
+              product hozircha cartda emas. Aks holda tugma kul rang, LEKIN
+              bosilishi mumkin — bosilganda foydalanuvchiga toast bilan
+              "o'lcham tanlang" xabari va chiplarga orange border chiqadi.
+              Kul rang holatda ikon qora rangda qoladi (foydalanuvchi ikonni
+              ko'rib turadi).
           */}
           <div className="mt-[30px] lg:mt-[50px] mb-[36px] flex items-stretch gap-2 sm:gap-3 w-full">
             {(() => {
               const hasSizes = sizes.length > 0;
               const cartActive = hasSizes ? !!selectedSize : !isInCart;
-              const cartDisabled = hasSizes && !selectedSize;
               return (
                 <button
                   type="button"
                   onClick={addToCart}
-                  disabled={cartDisabled}
-                  className={`flex-1 text-[13px] md:text-[14px] font-medium py-2 sm:py-[10px] rounded-lg px-4 sm:px-5 flex items-center justify-center gap-2 transition-colors ${
+                  className={`flex-1 text-[13px] md:text-[14px] font-medium py-2 sm:py-[10px] rounded-lg px-4 sm:px-5 flex items-center justify-center gap-2 transition-colors cursor-pointer ${
                     cartActive
-                      ? "bg-[#121212] text-white hover:bg-gray-800 cursor-pointer"
-                      : "bg-[#F4F4F4] text-[#9A9A9A] cursor-not-allowed"
+                      ? "bg-[#121212] text-white hover:bg-gray-800"
+                      : "bg-[#F4F4F4] text-[#9A9A9A] hover:bg-[#EAEAEA]"
                   }`}
                 >
                   {!hasSizes && isInCart ? (
                     t("added")
                   ) : (
                     <>
-                      <BackPlusIcons /> {t("addToCart")}
+                      <BackPlusIcons stroke={cartActive ? "white" : "#121212"} />{" "}
+                      {t("addToCart")}
                     </>
                   )}
                 </button>

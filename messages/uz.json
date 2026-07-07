@@ -176,7 +176,8 @@
         "availableSizes": "Mavjud o'lchamlar",
         "inStock": "{count} ta mavjud",
         "outOfStock": "Sotuvda yo'q",
-        "priceLabel": "Narxi"
+        "priceLabel": "Narxi",
+        "selectSizeFirst": "Iltimos, avval o'lcham tanlang"
     },
     "Auth": {
         "signInTitle": "Ro'yxatdan o'tish yoki Kirish",

@@ -176,7 +176,8 @@
         "availableSizes": "Доступные размеры",
         "inStock": "{count} шт. в наличии",
         "outOfStock": "Нет в наличии",
-        "priceLabel": "Цена"
+        "priceLabel": "Цена",
+        "selectSizeFirst": "Пожалуйста, сначала выберите размер"
     },
     "Auth": {
         "signInTitle": "Регистрация или Вход",

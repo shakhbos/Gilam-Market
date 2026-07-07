@@ -176,7 +176,8 @@
         "availableSizes": "Available sizes",
         "inStock": "{count} in stock",
         "outOfStock": "Out of stock",
-        "priceLabel": "Price"
+        "priceLabel": "Price",
+        "selectSizeFirst": "Please select a size first"
     },
     "Auth": {
         "signInTitle": "Sign up or Log in",
