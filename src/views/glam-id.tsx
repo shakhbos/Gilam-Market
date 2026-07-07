@@ -14,6 +14,7 @@ import { changeBuskets, changeLike } from "@/lib/features";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { fetchData } from "@/service/get";
 import { minio_img_url } from "@/utils/divice";
+import { formatSizeRange } from "@/utils/format-size-range";
 import type { GroupSize, PaginatedResponse, QrBaseProduct } from "@/types/api";
 
 interface Props {
@@ -534,7 +535,7 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
                 url={`/glam/${e.id}?modelId=${encodeURIComponent(e.model?.title ?? "")}&color=${encodeURIComponent(e.color?.title ?? "")}&collectionId=${encodeURIComponent(e.collection?.title ?? "")}`}
                 title={`${e.collection?.title ?? ""} ${e.model?.title ?? ""}`.trim()}
                 type={e.sizeType ?? undefined}
-                text={e.size?.title ?? ""}
+                text={formatSizeRange(e)}
                 image={cardImg}
                 video={cardVideo}
                 isLike={cardIsLiked}
