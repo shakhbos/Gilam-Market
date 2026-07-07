@@ -41,11 +41,14 @@ export interface Collection extends NamedEntity {
 /**
  * Guruh (Collection + Model + Shape + Color) ichidagi bitta o'lcham:
  *   - id: sizeId
+ *   - qrBaseId: shu size'ni ifodalovchi eng yangi QrBase id (cart'ga
+ *     qo'shish uchun kerak; backend eng oxirgi date bo'yicha tanlaydi)
  *   - x, y: fizik o'lcham (metrda: 3.0 = 300 sm)
  *   - count: shu o'lchamdagi mavjud (aktiv, band emas) mahsulotlar soni
  */
 export interface GroupSize {
   id: string;
+  qrBaseId?: string | null;
   x: number;
   y: number;
   count: number;
@@ -80,6 +83,12 @@ export interface QrBaseProduct {
 
   sizes?: GroupSize[];
   total_count?: number;
+  /**
+   * `/qr-base/i-market/:id` includeGroupSizes bilan qaytaradi — aynan
+   * shu QrBase (size) uchun sotuvda qolgan miqdor. Cart stock cap uchun
+   * eng aniq ma'lumot.
+   */
+  stock_this_size?: number;
   total_volume?: number;
 }
 

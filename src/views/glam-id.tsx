@@ -109,6 +109,39 @@ export default function GlamById({ product, relatedProducts }: Props) {
   const isInCart = buskets.some((b) => b.id === product.id);
   const isLiked = likes.some((l) => l.id === product.id);
 
+  // Chip → cart item: joriy product'ning umumiy fieldlarini (collection,
+  // model, imgUrl, i_price...) ko'chirib, faqat id + size + stock aynan
+  // shu chip'ga tegishli qilib almashtiramiz. Shu tariqa siblinglar
+  // uchun sotib olish ma'lumotlari to'liq bo'ladi.
+  const chipToCartItem = (s: GroupSize) => ({
+    ...product,
+    id: s.qrBaseId || product.id,
+    size: {
+      ...(product.size ?? {}),
+      id: s.id,
+      x: s.x,
+      y: s.y,
+      title: `${Math.round(s.x * 100)}x${Math.round(s.y * 100)}`,
+    } as QrBaseProduct["size"],
+    stock_this_size: s.count,
+  });
+
+  const isSizeInCart = (s: GroupSize) => {
+    const id = s.qrBaseId || product.id;
+    return buskets.some((b) => b.id === id);
+  };
+
+  const toggleSize = (s: GroupSize) => {
+    if (!s.qrBaseId) return; // ma'lumotsiz eski javob bilan yumshoq no-op
+    const item = chipToCartItem(s);
+    const inCart = isSizeInCart(s);
+    dispatch(
+      inCart
+        ? changeBuskets(buskets.filter((b) => b.id !== item.id))
+        : changeBuskets([item, ...buskets]),
+    );
+  };
+
   const toggleCart = () => {
     dispatch(
       isInCart
@@ -237,8 +270,10 @@ export default function GlamById({ product, relatedProducts }: Props) {
             </p>
           </div>
 
-          {/* Guruhga tegishli aktiv o'lchamlar — har biriga qoldiq soni bilan.
-              Chip'lar informativ, tanlash uchun. */}
+          {/* Guruhga tegishli aktiv o'lchamlar — chip'lar bosilganda cart'ga
+              qo'shiladi/o'chiriladi. Foydalanuvchi 1 yoki bir necha size
+              tanlashi mumkin — har biri sibling QrBase sifatida saqlanadi
+              va cart'da alohida qator bo'ladi. */}
           {sizes.length > 0 && (
             <section aria-label={t("availableSizes")} className="mb-[32px] lg:mb-[49px]">
               <p className="text-[14px] text-[#6B6B6B] mb-2">
@@ -247,17 +282,29 @@ export default function GlamById({ product, relatedProducts }: Props) {
               <div className="flex flex-wrap gap-2">
                 {sizes.map((s) => {
                   const label = `${Math.round(Number(s.x || 0) * 100)}x${Math.round(Number(s.y || 0) * 100)}`;
+                  const inCart = isSizeInCart(s);
+                  const disabled = !s.qrBaseId;
                   return (
-                    <span
+                    <button
                       key={s.id}
+                      type="button"
+                      onClick={() => toggleSize(s)}
+                      disabled={disabled}
+                      aria-pressed={inCart}
                       title={t("inStock", { count: s.count })}
-                      className="bg-[#F4F4F4] text-[#212121] px-3 py-2 rounded-[5px] text-[14px] lg:text-[16px] inline-flex items-center gap-2"
+                      className={`px-3 py-2 rounded-[5px] text-[14px] lg:text-[16px] inline-flex items-center gap-2 transition-colors border ${
+                        inCart
+                          ? "bg-[#121212] text-white border-[#121212]"
+                          : "bg-[#F4F4F4] text-[#212121] border-transparent hover:border-[#121212]"
+                      } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                     >
                       <span>{label}</span>
-                      <span className="text-[12px] text-[#6B6B6B]">
+                      <span
+                        className={`text-[12px] ${inCart ? "text-white/70" : "text-[#6B6B6B]"}`}
+                      >
                         ({s.count})
                       </span>
-                    </span>
+                    </button>
                   );
                 })}
               </div>
