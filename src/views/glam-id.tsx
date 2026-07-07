@@ -413,37 +413,49 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
               <p className="text-[14px] text-[#6B6B6B] mb-2">
                 {t("availableSizes")}
               </p>
-              <div className="flex flex-wrap gap-2">
-                {sizes.map((s) => {
-                  const label = `${Math.round(Number(s.x || 0) * 100)}x${Math.round(Number(s.y || 0) * 100)}`;
-                  const isSelected = selectedSizeId === s.id;
-                  const disabled = !s.qrBaseId || Number(s.count) <= 0;
-                  return (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() => selectSize(s)}
-                      disabled={disabled}
-                      aria-pressed={isSelected}
-                      title={t("inStock", { count: s.count })}
-                      className={`px-3 py-2 rounded-[5px] text-[14px] lg:text-[16px] inline-flex items-center gap-2 transition-colors border ${
-                        isSelected
-                          ? "bg-[#121212] text-white border-[#121212]"
-                          : highlightChips
-                            ? "bg-[#F4F4F4] text-[#212121] border-[#F97316] animate-pulse"
-                            : "bg-[#F4F4F4] text-[#212121] border-transparent hover:border-[#121212]"
-                      } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-                    >
-                      <span>{label}</span>
-                      <span
-                        className={`text-[12px] ${isSelected ? "text-white/70" : "text-[#6B6B6B]"}`}
-                      >
-                        ({s.count})
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+              {/* Highlight uchun 1-chi tanlanishi mumkin bo'lgan chip'ning
+                  id'sini olamiz — foydalanuvchining diqqatini eng arzon /
+                  eng ommaviy o'lchamga qaratamiz. */}
+              {(() => {
+                const firstEnabledId =
+                  sizes.find((s) => !!s.qrBaseId && Number(s.count) > 0)?.id ??
+                  null;
+                return (
+                  <div className="flex flex-wrap gap-2">
+                    {sizes.map((s) => {
+                      const label = `${Math.round(Number(s.x || 0) * 100)}x${Math.round(Number(s.y || 0) * 100)}`;
+                      const isSelected = selectedSizeId === s.id;
+                      const disabled = !s.qrBaseId || Number(s.count) <= 0;
+                      const highlighted =
+                        highlightChips && s.id === firstEnabledId && !isSelected;
+                      return (
+                        <button
+                          key={s.id}
+                          type="button"
+                          onClick={() => selectSize(s)}
+                          disabled={disabled}
+                          aria-pressed={isSelected}
+                          title={t("inStock", { count: s.count })}
+                          className={`px-3 py-2 rounded-[5px] text-[14px] lg:text-[16px] inline-flex items-center gap-2 transition-colors border-2 ${
+                            isSelected
+                              ? "bg-[#121212] text-white border-[#121212]"
+                              : highlighted
+                                ? "bg-[#FFF7ED] text-[#212121] border-[#F97316] animate-pulse"
+                                : "bg-[#F4F4F4] text-[#212121] border-transparent hover:border-[#121212]"
+                          } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                        >
+                          <span>{label}</span>
+                          <span
+                            className={`text-[12px] ${isSelected ? "text-white/70" : "text-[#6B6B6B]"}`}
+                          >
+                            ({s.count})
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
               {totalInStock === 0 && (
                 <p className="text-[12px] text-red-500 mt-2">
                   {t("outOfStock")}
