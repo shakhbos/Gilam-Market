@@ -466,14 +466,14 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
             </div>
           )}
 
-          {/* Uchta harakat tugmasi bir qatorda: savatga qo'shish (asosiy,
-              siyahroq), Yoqdi (secondary) va Ulashish (secondary). Cart
-              tugmasi endi flex-1 emas — o'z tabiiy o'lchamiga qaytdi. */}
-          <div className="mt-[30px] lg:mt-[50px] mb-[36px] flex flex-wrap items-center gap-2 sm:gap-3">
+          {/* Uchta harakat tugmasi bitta chiziqda — chapdan o'ngga
+              to'liq kenglikni to'ldiradi. Cart flex-1 (asosiy, kengroq),
+              Yoqdi va Ulashish tabiiy o'lchamda. */}
+          <div className="mt-[30px] lg:mt-[50px] mb-[36px] flex items-stretch gap-2 sm:gap-3 w-full">
             <button
               type="button"
               onClick={toggleCart}
-              className="bg-[#121212] text-white text-[13px] md:text-[14px] font-medium py-2 sm:py-[10px] rounded-lg px-4 sm:px-5 flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors"
+              className="flex-1 bg-[#121212] text-white text-[13px] md:text-[14px] font-medium py-2 sm:py-[10px] rounded-lg px-4 sm:px-5 flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors"
             >
               {isInCart ? (
                 t("added")
@@ -488,7 +488,7 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
               type="button"
               onClick={toggleLike}
               aria-pressed={isLiked}
-              className="text-[#121212] bg-[#F4F4F4] text-[13px] md:text-[14px] font-medium py-2 sm:py-[10px] rounded-lg px-4 sm:px-5 flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors"
+              className="shrink-0 text-[#121212] bg-[#F4F4F4] text-[13px] md:text-[14px] font-medium py-2 sm:py-[10px] rounded-lg px-4 sm:px-5 flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors"
             >
               <LikeIcons
                 stroke={isLiked ? "red" : "black"}
@@ -500,7 +500,7 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
             <button
               type="button"
               onClick={share}
-              className="text-[#121212] bg-[#F4F4F4] text-[13px] md:text-[14px] font-medium py-2 sm:py-[10px] rounded-lg px-4 sm:px-5 flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors"
+              className="shrink-0 text-[#121212] bg-[#F4F4F4] text-[13px] md:text-[14px] font-medium py-2 sm:py-[10px] rounded-lg px-4 sm:px-5 flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors"
             >
               <ShareIcons />
               {t("share")}
