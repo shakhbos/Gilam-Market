@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "../i18n/routing";
+import LanguageSwitcher from "./language-switcher";
 
 const CATEGORIES = [
     { key: "categoryLivingRoom", value: "living_room" },
@@ -22,6 +23,9 @@ export default function Menu() {
     return (
         <div className="w-full bg-white pb-5">
             <div className="flex flex-col gap-8 pl-5 md:pl-14 pr-5 px-4 justify-between">
+                {/* Til almashtiruvchi — antd Drawer'ning X iconi bilan bir qatorda,
+                    logo bilan chapdan bir chiziqda (pl-5 md:pl-14 shu container'da). */}
+                <LanguageSwitcher />
                 <div className="flex flex-col w-full">
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                         <div className="flex items-center gap-3">
