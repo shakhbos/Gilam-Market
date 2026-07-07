@@ -29,7 +29,6 @@ export default function BusketPage() {
     dispatch(changeBuskets(buskets?.map((itms) => itms?.id === e?.id ? { ...itms, count: count } : itms)));
   };
 
-  console.log(buskets)
   return (
     <div className="w-full max-w-[1100px] md:gap-[20px] gap-3 items-start flex flex-col lg:flex-row xl:flex-nowrap justify-between md:px-4 sm:px-0">
       <div className="w-full">

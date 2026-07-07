@@ -123,7 +123,6 @@ export default function FilterModal({ onClose }: FilterModalProps) {
         router.replace(pathname);
         onClose();
     };
-    console.log(shapes)
 
     return (
         <div className="fixed z-[1000] inset-0 bg-[#00000080] flex items-center justify-center p-4" onClick={onClose}>
