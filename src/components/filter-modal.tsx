@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useRouter, usePathname } from "../i18n/routing";
 import { CloseIcons } from "./icons";
 
@@ -12,6 +13,7 @@ interface FilterModalProps {
 
 
 export default function FilterModal({ onClose }: FilterModalProps) {
+    const t = useTranslations("Filter");
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
@@ -142,7 +144,7 @@ export default function FilterModal({ onClose }: FilterModalProps) {
                             <div className="w-full text-center flex items-end justify-center h-[160px] bg-gray-100 rounded-lg overflow-hidden relative">
                                 <Image className="w-[222px] h-[149px]" src="/count.png" alt="Piece" width={222} height={149} />
                             </div>
-                            <span className="text-sm font-medium">Штучные ковры</span>
+                            <span className="text-sm font-medium">{t("piece")}</span>
                         </div>
                         <div
                             onClick={() => setSelectedType("meter")}
@@ -151,12 +153,12 @@ export default function FilterModal({ onClose }: FilterModalProps) {
                             <div className="w-full text-center h-[160px]  flex items-end justify-center bg-gray-100 rounded-lg overflow-hidden relative">
                                 <Image className="w-[222px] h-[149px]" src="/metric.png" alt="Piece" width={222} height={149} />
                             </div>
-                            <span className="text-sm font-medium">Метражные ковры</span>
+                            <span className="text-sm font-medium">{t("metric")}</span>
                         </div>
                     </div>
 
                     <div className="mb-8">
-                        <h3 className="text-center font-bold mb-4">Форма</h3>
+                        <h3 className="text-center font-bold mb-4">{t("shape")}</h3>
                         <div className="flex flex-wrap justify-center gap-6">
                             {shapes.map((shape) => (
                                 <div key={shape.id} className="flex flex-col items-center gap-2 cursor-pointer" onClick={() => handleFilterChange("shape", shape.id)}>
@@ -171,7 +173,7 @@ export default function FilterModal({ onClose }: FilterModalProps) {
 
                     {/* Styles */}
                     <div className="mb-8">
-                        <h3 className="text-center font-bold mb-4">Стиль</h3>
+                        <h3 className="text-center font-bold mb-4">{t("style")}</h3>
                         <div className="flex flex-wrap justify-center gap-6">
                             {styles.map((style) => (
                                 <div
@@ -191,7 +193,7 @@ export default function FilterModal({ onClose }: FilterModalProps) {
 
                     {/* Colors */}
                     <div className="mb-8">
-                        <h3 className="text-center font-bold mb-4">Цвет</h3>
+                        <h3 className="text-center font-bold mb-4">{t("color")}</h3>
                         <div className="flex flex-wrap justify-center gap-4">
                             {colors.map((color) => (
                                 <div
@@ -208,10 +210,10 @@ export default function FilterModal({ onClose }: FilterModalProps) {
 
                     {/* Dimensions */}
                     <div className="mb-8">
-                        <h3 className="text-center font-bold mb-4">Размеры</h3>
+                        <h3 className="text-center font-bold mb-4">{t("sizes")}</h3>
                         <div className="flex flex-col md:flex-row justify-center gap-8">
                             <div className="flex flex-col items-center">
-                                <span className="mb-2 text-sm font-medium">Ширина (x)</span>
+                                <span className="mb-2 text-sm font-medium">{t("width")}</span>
                                 <div className="grid grid-cols-7 gap-2">
                                     {sizes.map((size, i) => (
                                         <div
@@ -225,7 +227,7 @@ export default function FilterModal({ onClose }: FilterModalProps) {
                                 </div>
                             </div>
                             <div className="flex flex-col items-center">
-                                <span className="mb-2 text-sm font-medium">Длина (y)</span>
+                                <span className="mb-2 text-sm font-medium">{t("length")}</span>
                                 <div className="grid grid-cols-7 gap-2">
                                     {sizes.map((size, i) => (
                                         <div
@@ -248,13 +250,13 @@ export default function FilterModal({ onClose }: FilterModalProps) {
                         onClick={clearFilters}
                         className="flex-1 py-3 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center gap-2"
                     >
-                        <span>✕</span> Очистить
+                        <span>✕</span> {t("clear")}
                     </button>
                     <button
                         onClick={onClose}
                         className="flex-1 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors"
                     >
-                        Показать результат (1845)
+                        {t("showResults")}
                     </button>
                 </div>
             </div>
