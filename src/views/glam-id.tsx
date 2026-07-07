@@ -352,18 +352,21 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
         </div>
 
         <div className="w-full lg:max-w-[530px] mt-4 lg:mt-[20px]">
-          <h1 className="text-[18px] lg:text-[24px] leading-[24px] lg:leading-[30px] text-wrap lg:text-nowrap text-[#282A2C] font-normal mb-2">
-            {modelTitle}
+          {/* 1-qator: kolleksiya nomi yakka o'zi (katta bosh sarlavha). */}
+          <h1 className="text-[28px] lg:text-[40px] leading-[34px] lg:leading-[50px] font-semibold text-[#282A2C] mb-2 lg:mb-3">
+            {collectionTitle}
           </h1>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-5 gap-2">
-            <h2 className="text-[28px] lg:text-[40px] leading-[34px] lg:leading-[50px] font-semibold text-[#282A2C]">
-              {collectionTitle}
+          {/* 2-qator: model nomi + 1 m² narxi (so'mda). Narx marketPriceUsd
+              × usdRate — jami emas, faqat metr kvadrat. */}
+          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between mb-4 sm:mb-5 gap-2">
+            <h2 className="text-[18px] lg:text-[22px] leading-[24px] lg:leading-[28px] text-[#282A2C] font-normal">
+              {modelTitle}
             </h2>
             <p
               className="text-[20px] lg:text-[24px] leading-[24px] lg:leading-[26px] font-medium text-[#212121]"
               aria-label={t("priceLabel")}
             >
-              {uzsFormatter.format(Math.round(mainPriceUzs))} sum
+              {uzsFormatter.format(Math.round(marketPriceUsd * usdRate))} sum / m²
             </p>
           </div>
 
@@ -381,7 +384,6 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
                   const label = `${Math.round(Number(s.x || 0) * 100)}x${Math.round(Number(s.y || 0) * 100)}`;
                   const inCart = isSizeInCart(s);
                   const disabled = !s.qrBaseId;
-                  const uzs = priceForSize(s.x, s.y);
                   return (
                     <button
                       key={s.id}
@@ -389,30 +391,19 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
                       onClick={() => toggleSize(s)}
                       disabled={disabled}
                       aria-pressed={inCart}
-                      title={`${t("inStock", { count: s.count })} · ${uzsFormatter.format(Math.round(uzs))} sum`}
-                      className={`px-3 py-2 rounded-[5px] text-[14px] lg:text-[16px] inline-flex flex-col items-start gap-[2px] transition-colors border ${
+                      title={t("inStock", { count: s.count })}
+                      className={`px-3 py-2 rounded-[5px] text-[14px] lg:text-[16px] inline-flex items-center gap-2 transition-colors border ${
                         inCart
                           ? "bg-[#121212] text-white border-[#121212]"
                           : "bg-[#F4F4F4] text-[#212121] border-transparent hover:border-[#121212]"
                       } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                     >
-                      <span className="flex items-center gap-2">
-                        <span>{label}</span>
-                        <span
-                          className={`text-[12px] ${inCart ? "text-white/70" : "text-[#6B6B6B]"}`}
-                        >
-                          ({s.count})
-                        </span>
+                      <span>{label}</span>
+                      <span
+                        className={`text-[12px] ${inCart ? "text-white/70" : "text-[#6B6B6B]"}`}
+                      >
+                        ({s.count})
                       </span>
-                      {uzs > 0 && (
-                        <span
-                          className={`text-[12px] leading-none ${
-                            inCart ? "text-white/80" : "text-[#525252]"
-                          }`}
-                        >
-                          {uzsFormatter.format(Math.round(uzs))} sum
-                        </span>
-                      )}
                     </button>
                   );
                 })}
@@ -455,22 +446,34 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
           {tab === 1 ? (
             <div>
               <p className="text-[14px] lg:text-[15px] text-[#282A2C] leading-[22px] whitespace-pre-line">
-                {product.internetInfo ?? ""}
+                {/*
+                  Xususiyatlari — admin/product-characteristics sahifasidan
+                  kolleksiya darajasida saqlanadi (collection.description).
+                  QrBase.internetInfo eski maydon, fallback sifatida qoladi.
+                */}
+                {(product.collection as any)?.description?.trim() ||
+                  product.internetInfo ||
+                  ""}
               </p>
             </div>
           ) : (
             <div>
-              <p className="text-[14px] lg:text-[15px] text-[#282A2C] leading-[22px]">
-                {t("paymentDeliveryInfo")}
+              <p className="text-[14px] lg:text-[15px] text-[#282A2C] leading-[22px] whitespace-pre-line">
+                {/* To'lov va yetkazish — collection.paymentDeliveryInfo. */}
+                {(product.collection as any)?.paymentDeliveryInfo?.trim() ||
+                  t("paymentDeliveryInfo")}
               </p>
             </div>
           )}
 
-          <div className="mt-[30px] lg:mt-[50px] mb-[36px] flex flex-col sm:flex-row gap-3">
+          {/* Uchta harakat tugmasi bir qatorda: savatga qo'shish (asosiy,
+              siyahroq), Yoqdi (secondary) va Ulashish (secondary). Cart
+              tugmasi endi flex-1 emas — o'z tabiiy o'lchamiga qaytdi. */}
+          <div className="mt-[30px] lg:mt-[50px] mb-[36px] flex flex-wrap items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={toggleCart}
-              className="bg-[#121212] text-white text-[14px] md:text-[15px] font-medium py-3 rounded-lg px-6 flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors w-full sm:w-auto flex-1"
+              className="bg-[#121212] text-white text-[13px] md:text-[14px] font-medium py-2 sm:py-[10px] rounded-lg px-4 sm:px-5 flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors"
             >
               {isInCart ? (
                 t("added")
@@ -485,7 +488,7 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
               type="button"
               onClick={toggleLike}
               aria-pressed={isLiked}
-              className="text-[#121212] bg-[#F4F4F4] text-[14px] md:text-[15px] font-medium py-3 rounded-lg px-6 flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors w-full sm:w-auto"
+              className="text-[#121212] bg-[#F4F4F4] text-[13px] md:text-[14px] font-medium py-2 sm:py-[10px] rounded-lg px-4 sm:px-5 flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors"
             >
               <LikeIcons
                 stroke={isLiked ? "red" : "black"}
@@ -493,18 +496,16 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
               />
               {t("like")}
             </button>
-          </div>
 
-          <button
-            type="button"
-            onClick={share}
-            className="flex items-center gap-2 cursor-pointer bg-transparent"
-          >
-            <ShareIcons />
-            <span className="text-[#121212] text-[13px] leading-[15px]">
+            <button
+              type="button"
+              onClick={share}
+              className="text-[#121212] bg-[#F4F4F4] text-[13px] md:text-[14px] font-medium py-2 sm:py-[10px] rounded-lg px-4 sm:px-5 flex items-center justify-center gap-2 hover:bg-gray-200 transition-colors"
+            >
+              <ShareIcons />
               {t("share")}
-            </span>
-          </button>
+            </button>
+          </div>
         </div>
       </div>
 

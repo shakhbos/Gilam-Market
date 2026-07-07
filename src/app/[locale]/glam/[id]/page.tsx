@@ -144,12 +144,16 @@ export default async function GilamById({
     notFound();
   }
 
-  const searchTerms = [sp?.modelId, sp?.color, sp?.collectionId]
+  // Tavsiya etiladigan mahsulotlar — joriy productning rangi va shakli
+  // bilan mos, o'zi esa istisno (productId server-side filter). Multi-word
+  // search: color.title + shape.title backend CONCAT_WS ILIKE bilan
+  // istalgan tartibda topiladi.
+  const recommendSearch = [product.color?.title, product.shape?.title]
     .filter(Boolean)
     .join(" ")
     .trim();
   const related = await getRelatedProducts({
-    search: searchTerms,
+    search: recommendSearch,
     productId: id,
   });
 
