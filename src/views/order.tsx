@@ -13,28 +13,36 @@ import OrderModal from "@/components/order-modal";
 import { changeBuskets } from "@/lib/features";
 import LocationModal from "@/components/LocationModal";
 
-const typePayArr = ["cash", "payme", "click"];
+const typePayArr = ["cash", "payme", "click"] as const;
+type PaymentKey = (typeof typePayArr)[number];
 
-const paymentMap = {
+const paymentMap: Record<PaymentKey, string> = {
   cash: "IN_HAND",
   payme: "PAYME",
   click: "CLICK",
 };
+
+interface OrderLocation {
+  address?: string;
+  lat?: number;
+  lng?: number;
+}
 
 export default function OrderPage() {
   const { buskets } = useAppSelector((store) => store.buskets);
   const { userMe } = useAppSelector((store) => store.userMe);
   const [openMadal, setOpenMadal] = useState(false)
   const dispatch = useAppDispatch();
-  const [typePay, setTypePay] = useState("cash");
+  const [typePay, setTypePay] = useState<PaymentKey>("cash");
   const [comment, setComment] = useState("");
 
   const [orderDate, setOrderDate] = useState<any>(null);
   const [orderTime, setOrderTime] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [location, setLocation] = useState(null);
+  const [location, setLocation] = useState<OrderLocation | null>(null);
+
   const buildOrderBody = () => {
-    let combinedDate = null;
+    let combinedDate: string | null = null;
 
     if (orderDate) {
       combinedDate = orderDate.format("YYYY.MM.DD");
@@ -42,6 +50,11 @@ export default function OrderPage() {
         combinedDate = `${combinedDate} ${orderTime.format("HH:mm")}`;
       }
     }
+
+    const locationLink =
+      location?.lat != null && location?.lng != null
+        ? `https://yandex.com/maps/?pt=${location.lng},${location.lat}&z=17&l=map`
+        : undefined;
 
     return {
       client_order_items: buskets.map((item) => ({
@@ -51,12 +64,11 @@ export default function OrderPage() {
       payment_type: paymentMap[typePay],
       delivery_comment: comment,
       full_address: location?.address,
-      location_link: `https://yandex.com/maps/?pt=${location.lng},${location.lat}&z=17&l=map`,
+      location_link: locationLink,
       date: combinedDate,
       user: userMe?.id,
     };
   };
-  console.log(location)
 
   // 🚀 Submit order
   const submitOrder = async () => {
@@ -223,7 +235,7 @@ export default function OrderPage() {
                     className={"colm2 w-full"}
                     placeholder={"Улица, дом, ориентир, номер квартиры"}
                     required={true}
-                    value={location?.address || null}
+                    value={location?.address || ""}
                   // onChange={(e) => setAddress(e.target.value)}
                   />
 

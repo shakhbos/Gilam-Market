@@ -1,8 +1,9 @@
-import React from 'react'
-import BusketPage from '../../../../views/busket'
+import BusketPage from '../../../../views/busket';
 import { getTranslations } from 'next-intl/server';
+import type { Metadata } from 'next';
+import type { MetadataProps } from '@/types/next';
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Basket' });
 
@@ -12,14 +13,10 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title: t('title'),
       description: t('description'),
-    }
+    },
   };
 }
 
-export default function page() {
-  return (
-    <>
-      <BusketPage />
-    </>
-  )
+export default function BusketRoute() {
+  return <BusketPage />;
 }

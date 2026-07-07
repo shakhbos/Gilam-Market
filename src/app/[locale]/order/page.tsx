@@ -1,8 +1,9 @@
-import OrderPage from '@/views/order'
-import React from 'react'
+import OrderPage from '@/views/order';
 import { getTranslations } from 'next-intl/server';
+import type { Metadata } from 'next';
+import type { MetadataProps } from '@/types/next';
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Order' });
 
@@ -12,14 +13,10 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title: t('title'),
       description: t('description'),
-    }
+    },
   };
 }
 
-export default function page() {
-  return (
-    <>
-      <OrderPage />
-    </>
-  )
+export default function OrderRoute() {
+  return <OrderPage />;
 }

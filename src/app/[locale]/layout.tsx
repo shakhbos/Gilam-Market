@@ -12,10 +12,11 @@ import { SITE_URL } from '../../utils/seo';
 import { Inter } from 'next/font/google';
 import { Suspense } from "react";
 import Metrika from "@/components/Metrika";
+import type { LayoutProps, MetadataProps } from '@/types/next';
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 
-export async function generateMetadata({ params }): Promise<Metadata> {
+export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'Metadata' });
 
@@ -76,9 +77,9 @@ export async function generateMetadata({ params }): Promise<Metadata> {
   };
 }
 
-export default async function LocaleLayout({ children, params }) {
+export default async function LocaleLayout({ children, params }: LayoutProps) {
   const { locale } = await params;
-  if (!routing.locales.includes(locale)) {
+  if (!(routing.locales as readonly string[]).includes(locale)) {
     notFound();
   }
 

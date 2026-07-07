@@ -1,10 +1,6 @@
-import ProfileLayout from '../../../views/profile-layout'
-import React from 'react'
+import type { ReactNode } from 'react';
+import ProfileLayout from '../../../views/profile-layout';
 
-export default function Profilelayout({ children }) {
-  return (
-    <ProfileLayout>
-      {children}
-    </ProfileLayout>
-  )
+export default function ProfileRouteLayout({ children }: { children: ReactNode }) {
+  return <ProfileLayout>{children}</ProfileLayout>;
 }
