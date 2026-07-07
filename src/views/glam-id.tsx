@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
@@ -8,11 +8,13 @@ import Masonry from "react-masonry-css";
 
 import Back from "@/components/back";
 import GlamCard from "@/components/glam-card";
+import GlamCardSkeleton from "@/components/skeletons/glam-card-skeleton";
 import { BackPlusIcons, LikeIcons, ShareIcons } from "@/components/icons";
 import { changeBuskets, changeLike } from "@/lib/features";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import { fetchData } from "@/service/get";
 import { minio_img_url } from "@/utils/divice";
-import type { GroupSize, QrBaseProduct } from "@/types/api";
+import type { GroupSize, PaginatedResponse, QrBaseProduct } from "@/types/api";
 
 interface Props {
   id: string;
@@ -141,6 +143,56 @@ export default function GlamById({ product, relatedProducts }: Props) {
         : changeBuskets([item, ...buskets]),
     );
   };
+
+  // --- Pinterest-style pastdagi cheksiz scroll --- //
+  // Related products bilan boshlanadi, keyin /qr-base/i-market sahifa-
+  // sahifa yuklanadi. Ikkinchi ro'yxatda joriy productni va related'da
+  // ko'rilgan ID'larni dedup qilamiz.
+  const PAGE_SIZE = 20;
+  const [browsed, setBrowsed] = useState<QrBaseProduct[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const seenIds = useMemo(() => {
+    const set = new Set<string>();
+    set.add(product.id);
+    relatedProducts.forEach((r) => set.add(r.id));
+    browsed.forEach((r) => set.add(r.id));
+    return set;
+  }, [product.id, relatedProducts, browsed]);
+
+  const loadMore = useCallback(async () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+    try {
+      const res = await fetchData<PaginatedResponse<QrBaseProduct>>(
+        `${process.env.NEXT_PUBLIC_URL}/qr-base/i-market`,
+        { page, limit: PAGE_SIZE, status: "published" },
+      );
+      const fresh = (res?.items ?? []).filter((p) => !seenIds.has(p.id));
+      setBrowsed((prev) => [...prev, ...fresh]);
+      setPage((p) => p + 1);
+      if (!res?.items?.length || res.items.length < PAGE_SIZE) {
+        setHasMore(false);
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [loading, hasMore, page, seenIds]);
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) loadMore();
+      },
+      { rootMargin: "1800px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadMore]);
 
   const toggleCart = () => {
     dispatch(
@@ -399,22 +451,24 @@ export default function GlamById({ product, relatedProducts }: Props) {
         </div>
       </div>
 
-      {/* Related products */}
-      {relatedProducts.length > 0 && (
+      {/* Related products + Pinterest-style cheksiz scroll: bittada
+          bir xil Masonry ichida keladi — foydalanuvchi uchun ustun
+          uzilishlari sezilmaydi. */}
+      {(relatedProducts.length > 0 || browsed.length > 0) && (
         <Masonry
           breakpointCols={breakpointColumnsObj}
           className="flex gap-8 mt-60"
           columnClassName="flex flex-col gap-16"
         >
-          {relatedProducts.map((e) => {
-            const relatedImg = e.imgUrl?.path
+          {[...relatedProducts, ...browsed].map((e) => {
+            const cardImg = e.imgUrl?.path
               ? `${minio_img_url}${e.imgUrl.path}`
               : "";
-            const relatedVideo = e.videoUrl?.path
+            const cardVideo = e.videoUrl?.path
               ? `${minio_img_url}${e.videoUrl.path}`
               : undefined;
-            const relatedIsLiked = likes.some((l) => l.id === e.id);
-            const relatedInCart = buskets.some((b) => b.id === e.id);
+            const cardIsLiked = likes.some((l) => l.id === e.id);
+            const cardInCart = buskets.some((b) => b.id === e.id);
             return (
               <GlamCard
                 key={e.id}
@@ -423,19 +477,19 @@ export default function GlamById({ product, relatedProducts }: Props) {
                 title={`${e.collection?.title ?? ""} ${e.model?.title ?? ""}`.trim()}
                 type={e.sizeType ?? undefined}
                 text={e.size?.title ?? ""}
-                image={relatedImg}
-                video={relatedVideo}
-                isLike={relatedIsLiked}
+                image={cardImg}
+                video={cardVideo}
+                isLike={cardIsLiked}
                 onLike={() =>
                   dispatch(
-                    relatedIsLiked
+                    cardIsLiked
                       ? changeLike(likes.filter((it) => it.id !== e.id))
                       : changeLike([e, ...likes]),
                   )
                 }
                 onBuslet={() =>
                   dispatch(
-                    relatedInCart
+                    cardInCart
                       ? changeBuskets(buskets.filter((it) => it.id !== e.id))
                       : changeBuskets([e, ...buskets]),
                   )
@@ -444,8 +498,17 @@ export default function GlamById({ product, relatedProducts }: Props) {
               />
             );
           })}
+          {loading &&
+            Array.from({ length: 4 }).map((_, i) => (
+              <GlamCardSkeleton key={`sk-${i}`} />
+            ))}
         </Masonry>
       )}
+
+      {/* Sentinel — IntersectionObserver ushbu elementga ~1800px yaqinlashganda
+          keyingi sahifani yuklaydi. hasMore=false bo'lganda ham DOM'da qoladi
+          (invisible) — sxema soddaligi uchun. */}
+      <div ref={sentinelRef} className="h-10 w-full" />
     </>
   );
 }
