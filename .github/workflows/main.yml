@@ -1,0 +1,43 @@
+name: Deploy Gilam Market
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Build (sanity check)
+        env:
+          NEXT_PUBLIC_URL: https://api.gilam-market.uz/api
+          NEXT_PUBLIC_APP_URL: https://gilam-market.uz
+        run: npm run build
+
+  deploy:
+    needs: build-check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to production server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          command_timeout: 20m
+          script: |
+            set -e
+            cd /var/www/gilam-market
+            git fetch origin main
+            git reset --hard origin/main
+            npm ci --no-audit --no-fund
+            npm run build
+            pm2 restart gilam-market --update-env
+            echo "Gilam Market deployed."
