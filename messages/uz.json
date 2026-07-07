@@ -1,0 +1,70 @@
+{
+    "lang": "uz",
+    "Metadata": {
+        "title": "Gilam Market - O'zbekistonda premium gilamlar",
+        "description": "Gilam Marketda sifatli Turk, Eron va O'zbek gilamlarini xarid qiling. Keng o'lchamlar, zamonaviy va klassik dizaynlar butun O'zbekiston bo'ylab yetkazib berish xizmati bilan.",
+        "ogTitle": "Gilam Market - Premium gilamlar va poyandozlar onlayn",
+        "ogDescription": "O'zbekistondagi eng yaxshi gilamlar to'plamini kashf eting. Turk, Eron va mahalliy dizaynlar onlayn xarid qilish va uyga yetkazib berish xizmati bilan mavjud."
+    },
+    "About": {
+        "title": "Biz haqimizda - Gilam Market",
+        "description": "Gilam Market haqida ko'proq bilib oling - O'zbekistonda premium gilamlar yetkazib beruvchi yetakchi kompaniya. Biz Turk, Eron va O'zbek gilamlarining keng tanlovini taklif etamiz."
+    },
+    "Delivery": {
+        "title": "Yetkazib berish - Gilam Market",
+        "description": "O'zbekiston bo'ylab tez va ishonchli gilam yetkazib berish xizmati. Yetkazib berish shartlari bilan tanishing."
+    },
+    "Payment": {
+        "title": "To'lov usullari - Gilam Market",
+        "description": "Gilam Marketda buyurtmalar uchun xavfsiz to'lov usullari. Biz turli xil to'lov shakllarini qabul qilamiz."
+    },
+    "Account": {
+        "title": "Mening hisobim - Gilam Market",
+        "description": "Shaxsiy ma'lumotlaringizni boshqaring va buyurtmalaringizni kuzatib boring."
+    },
+    "Basket": {
+        "title": "Savatcha - Gilam Market",
+        "description": "Tanlangan gilamlarni ko'rib chiqing va xaridni yakunlang."
+    },
+    "Likes": {
+        "title": "Saralanganlar - Gilam Market",
+        "description": "Sizga yoqqan barcha gilamlar bir joyda."
+    },
+    "MyOrders": {
+        "title": "Buyurtmalarim - Gilam Market",
+        "description": "Barcha amalga oshirilgan va joriy buyurtmalar tarixi."
+    },
+    "Order": {
+        "title": "Buyurtma berish - Gilam Market",
+        "description": "Buyurtmani rasmiylashtirish va yetkazib berish manzilini kiritish."
+    },
+    "Layout": {
+        "menu": "Menyu",
+        "search": "Qidirish",
+        "filter": "Filtr",
+        "profile": "Profil",
+        "login": "Kirish",
+        "cart": "Savatcha",
+        "likes": "Saralanganlar"
+    },
+    "Home": {
+        "heroTitle": "Nafislik olamiga sho'ng'ing!",
+        "heroSubtitle": "Turk, Eron va O'zbek gilamlari - faqat premium sifat va hamyonbop narxlar.",
+        "searchResults": "\"{query}\" uchun qidiruv natijalari"
+    },
+    "Product": {
+        "characteristics": "Xususiyatlari",
+        "paymentAndDelivery": "To'lov va yetkazib berish",
+        "addToCart": "Savatchaga qo'shish",
+        "added": "Qo'shildi",
+        "like": "Yoqdi",
+        "share": "Ulashish",
+        "noImage": "Rasm yo'q",
+        "paymentDeliveryInfo": "Qo'shimcha ma'lumot olish uchun bog'laning."
+    },
+    "NotFound": {
+        "title": "Sahifa topilmadi",
+        "description": "Siz qidirayotgan sahifa mavjud emas.",
+        "button": "Bosh sahifaga"
+    }
+}

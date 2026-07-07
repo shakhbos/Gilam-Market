@@ -1,0 +1,70 @@
+{
+    "lang": "en",
+    "Metadata": {
+        "title": "Gilam Market - Premium Carpets in Uzbekistan",
+        "description": "Buy premium quality Turkish, Iranian, and Uzbek carpets at Gilam Market. Wide range of sizes, modern and classic designs with delivery across Uzbekistan.",
+        "ogTitle": "Gilam Market - Premium Carpets & Rugs Online",
+        "ogDescription": "Discover the best collection of carpets in Uzbekistan. Turkish, Iranian, and local designs available for online purchase with home delivery."
+    },
+    "About": {
+        "title": "About Us - Gilam Market",
+        "description": "Learn more about Gilam Market, the leading provider of premium carpets in Uzbekistan. We offer a wide selection of Turkish, Iranian, and Uzbek rugs."
+    },
+    "Delivery": {
+        "title": "Delivery Information - Gilam Market",
+        "description": "Fast and reliable carpet delivery across Uzbekistan. Check our delivery terms and conditions."
+    },
+    "Payment": {
+        "title": "Payment Methods - Gilam Market",
+        "description": "Secure payment options for your carpet orders at Gilam Market. We accept various payment methods."
+    },
+    "Account": {
+        "title": "My Account - Gilam Market",
+        "description": "Manage your personal information and track your orders."
+    },
+    "Basket": {
+        "title": "Cart - Gilam Market",
+        "description": "Review your selected carpets and complete your purchase."
+    },
+    "Likes": {
+        "title": "Favorites - Gilam Market",
+        "description": "All your favorite carpets in one place."
+    },
+    "MyOrders": {
+        "title": "My Orders - Gilam Market",
+        "description": "History of all completed and current orders."
+    },
+    "Order": {
+        "title": "Checkout - Gilam Market",
+        "description": "Complete your order and enter delivery address."
+    },
+    "Layout": {
+        "menu": "Menu",
+        "search": "Search",
+        "filter": "Filter",
+        "profile": "Profile",
+        "login": "Login",
+        "cart": "Cart",
+        "likes": "Favorites"
+    },
+    "Home": {
+        "heroTitle": "Dive into the world of sophistication!",
+        "heroSubtitle": "Turkish, Iranian, and Uzbek carpets - only premium quality and affordable prices.",
+        "searchResults": "Search results for \"{query}\""
+    },
+    "Product": {
+        "characteristics": "Characteristics",
+        "paymentAndDelivery": "Payment & Delivery",
+        "addToCart": "Add to Cart",
+        "added": "Added",
+        "like": "Liked",
+        "share": "Share",
+        "noImage": "No Image",
+        "paymentDeliveryInfo": "Contact us for more information."
+    },
+    "NotFound": {
+        "title": "Page Not Found",
+        "description": "The page you are looking for does not exist.",
+        "button": "Go Home"
+    }
+}
