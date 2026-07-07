@@ -1,29 +1,27 @@
 "use client";
-import React from "react";
+
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Link } from "../i18n/routing";
 
-const filters = {
-    category: [
-        { label: "Для гостиной", value: "living_room" },
-        { label: "Для спальни", value: "bedroom" },
-        { label: "Детские", value: "kids" },
-        { label: "Кухонные", value: "kitchen" },
-        { label: "Для прихожей", value: "hallway" },
-        { label: "Офисные", value: "office" },
-        { label: "Кабинетные", value: "cabinet" },
-        { label: "Для лестниц", value: "stairs" },
-        { label: "Уличные", value: "outdoor" },
-    ],
-
-};
+const CATEGORIES = [
+    { key: "categoryLivingRoom", value: "living_room" },
+    { key: "categoryBedroom", value: "bedroom" },
+    { key: "categoryKids", value: "kids" },
+    { key: "categoryKitchen", value: "kitchen" },
+    { key: "categoryHallway", value: "hallway" },
+    { key: "categoryOffice", value: "office" },
+    { key: "categoryCabinet", value: "cabinet" },
+    { key: "categoryStairs", value: "stairs" },
+    { key: "categoryOutdoor", value: "outdoor" },
+] as const;
 
 export default function Menu() {
+    const t = useTranslations("Menu");
 
     return (
         <div className="w-full bg-white pb-5">
             <div className="flex flex-col gap-8 pl-5 md:pl-14 pr-5 px-4 justify-between">
-                {/* Header & Nav */}
                 <div className="flex flex-col w-full">
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                         <div className="flex items-center gap-3">
@@ -36,44 +34,42 @@ export default function Menu() {
                             />
                             <div>
                                 <h3 className="text-lg text-sm text-[#333]">OOO Gilam Market</h3>
-                                <p className="text-sm text-gray-500">Онлайн интернет магазин</p>
+                                <p className="text-sm text-gray-500">{t("companyTagline")}</p>
                             </div>
                         </div>
 
                         <nav className="flex flex-wrap gap-4 md:gap-8 text-[16px] font-medium text-[#333]">
-                            <Link href="/about">О нас</Link>
-                            <Link href="/delivery">О доставке</Link>
-                            <Link href="/payment">Об оплате</Link>
+                            <Link href="/about">{t("aboutLink")}</Link>
+                            <Link href="/delivery">{t("deliveryLink")}</Link>
+                            <Link href="/payment">{t("paymentLink")}</Link>
                         </nav>
                     </div>
 
-                    {/* Categories as Links */}
                     <div className="flex flex-wrap gap-4 my-[45px] md:gap-8">
-                        {filters.category.map((item) => (
+                        {CATEGORIES.map((item) => (
                             <Link
                                 key={item.value}
                                 href={`/?category=${item.value}`}
                                 className="text-[15px] text-[#333] hover:text-black hover:underline transition-colors"
                             >
-                                {item.label}
+                                {t(item.key)}
                             </Link>
                         ))}
                     </div>
 
-                    {/* Contacts */}
                     <div className="space-y-4">
-                        <h4 className="font-bold text-lg text-[#333]">Контакты</h4>
+                        <h4 className="font-bold text-lg text-[#333]">{t("contactsTitle")}</h4>
                         <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
                             <div>
-                                <p className="text-xs text-gray-400 mb-1">Адрес</p>
+                                <p className="text-xs text-gray-400 mb-1">{t("addressLabel")}</p>
                                 <p className="text-sm font-medium text-[#333]">
-                                    ул.Паркентский,131 А
+                                    {t("addressValue")}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-xs text-gray-400 mb-1">Номер</p>
+                                <p className="text-xs text-gray-400 mb-1">{t("phoneLabel")}</p>
                                 <a
-                                    href="tel:+998991404422"
+                                    href="tel:+998946093444"
                                     className="text-sm font-medium text-[#333]"
                                 >
                                     +998 94 609-34-44

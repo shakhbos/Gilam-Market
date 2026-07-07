@@ -1,42 +1,42 @@
 import InfoPageLayout from "../../../components/info-page-layout";
-import { getTranslations } from 'next-intl/server';
-import type { Metadata } from 'next';
-import type { MetadataProps } from '@/types/next';
-import { localizedAlternates } from '@/utils/metadata';
+import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
+import type { MetadataProps, PageProps } from "@/types/next";
+import { localizedAlternates } from "@/utils/metadata";
+
+const CONTACT_TEL = "+998946093444";
+const CONTACT_TEL_DISPLAY = "+998 94 609 34 44";
 
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
     const { locale } = await params;
-    const t = await getTranslations({ locale, namespace: 'Delivery' });
+    const t = await getTranslations({ locale, namespace: "Delivery" });
     return {
-        title: t('title'),
-        description: t('description'),
-        alternates: localizedAlternates(locale, '/delivery'),
+        title: t("title"),
+        description: t("description"),
+        alternates: localizedAlternates(locale, "/delivery"),
     };
 }
 
-export default function DeliveryPage() {
+export default async function DeliveryPage({ params }: PageProps) {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: "Delivery" });
+
     return (
-        <InfoPageLayout title="О доставке">
+        <InfoPageLayout title={t("pageTitle")}>
             <div className="flex flex-col gap-6 text-[14px] md:text-[16px] leading-[20px] md:leading-[24px] text-[#212121]">
+                <p>{t("body1")}</p>
+                <p>{t("body2")}</p>
                 <p>
-                    Благодарим вас за покупку в нашем интернет-магазине ковров. Мы искренне ценим оказанное нам доверие и рады, что вы выбрали именно нас для приобретения качественных ковровых изделий.
+                    {t("body3Prefix")}{" "}
+                    <a href={`tel:${CONTACT_TEL}`} className="text-blue-600 hover:underline">
+                        {CONTACT_TEL_DISPLAY}
+                    </a>
+                    .
                 </p>
-                <p>
-                    Сообщаем, что доставка приобретённых вами ковров осуществляется в течение 7 (семи) календарных дней с момента подтверждения заказа. Мы тщательно контролируем процесс обработки, упаковки и транспортировки продукции, чтобы каждый заказ был доставлен в надлежащем состоянии и в установленные сроки. Нашей главной задачей является обеспечение высокого уровня сервиса и максимального удобства для наших клиентов.
-                </p>
-                <p>
-                    В случае необходимости уточнения деталей доставки, адреса, удобного времени получения заказа либо при возникновении дополнительных вопросов, просим вас связаться с нами по телефону: <a href="tel:+998946093444" className="text-blue-600 hover:underline">+998 94 609 34 44</a>.
-                </p>
-                <p>
-                    Наши специалисты с готовностью предоставят вам всю необходимую информацию и окажут оперативную поддержку.
-                </p>
-                <p>
-                    Мы благодарим вас за то, что выбрали наш интернет-магазин, и уверены, что приобретённые ковры будут радовать вас своим качеством, дизайном и долговечностью. Для нас большая честь предоставлять нашим клиентам надёжные и эстетичные ковровые продукты, соответствующие высоким стандартам.
-                </p>
-                <p>
-                    Надеемся на долгосрочное сотрудничество и будем рады видеть вас среди наших постоянных клиентов.
-                </p>
+                <p>{t("body4")}</p>
+                <p>{t("body5")}</p>
+                <p>{t("body6")}</p>
             </div>
         </InfoPageLayout>
     );
-} 
+}

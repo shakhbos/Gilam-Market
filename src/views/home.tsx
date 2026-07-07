@@ -105,11 +105,10 @@ export default function HomePage({ product, search }: HomePageProps) {
           />
         </Link>
         <h3 className="text-[17px] leading-[20px] text-[#212121] mt-5 mb-[7px] font-semibold">
-          Погрузитесь в мир утончённости!
+          {t("heroTitle")}
         </h3>
         <p className="text-normal text-[14px] leading-[16.71px]">
-          Турецкие, иранские и узбекские ковры – только премиальное качество и
-          доступные цены.
+          {t("heroSubtitle")}
         </p>
       </header>
 

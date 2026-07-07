@@ -1,46 +1,39 @@
 import InfoPageLayout from "../../../components/info-page-layout";
-import { getTranslations } from 'next-intl/server';
-import type { Metadata } from 'next';
-import type { MetadataProps } from '@/types/next';
-import { localizedAlternates } from '@/utils/metadata';
+import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
+import type { MetadataProps, PageProps } from "@/types/next";
+import { localizedAlternates } from "@/utils/metadata";
 
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
     const { locale } = await params;
-    const t = await getTranslations({ locale, namespace: 'About' });
+    const t = await getTranslations({ locale, namespace: "About" });
     return {
-        title: t('title'),
-        description: t('description'),
-        alternates: localizedAlternates(locale, '/about'),
+        title: t("title"),
+        description: t("description"),
+        alternates: localizedAlternates(locale, "/about"),
     };
 }
 
-export default function AboutPage() {
+export default async function AboutPage({ params }: PageProps) {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: "About" });
+
     return (
-        <InfoPageLayout title="О нас">
+        <InfoPageLayout title={t("pageTitle")}>
             <div className="flex flex-col gap-6 text-[14px] md:text-[16px] leading-[20px] md:leading-[24px] text-[#212121]">
-                <p>
-                    Добро пожаловать в наш интернет-магазин ковров – место, где качество, стиль и уют соединяются!
-                    Мы гордимся тем, что предлагаем широкий ассортимент ковров, который удовлетворит самые изысканные вкусы. В нашем магазине вы найдете очаровательные премиум-ковры, произведенные в Турции и Иране, странах, известных своим многовековым мастерством и традициями изготовления ковров. Наш ассортимент включает более 100 коллекций и свыше 500 моделей ковров. У нас есть ковры для любого интерьера – от классических до современных, от небольших акцентов до больших решений, создающих уют в вашем доме. Мы предлагаем различные категории ковров, включая:
-                </p>
+                <p>{t("body1")}</p>
+                <p className="font-medium">{t("categoriesTitle")}</p>
                 <ul className="list-disc pl-5 space-y-2">
-                    <li>Ковры для гостиной – для создания теплой и стильной атмосферы.</li>
-                    <li>Ковры для спальни – добавят уюта и уединения.</li>
-                    <li>Ковры для детской – безопасные и красочные для радости ваших детей.</li>
-                    <li>Уличные ковры – долговечные и практичные для террас и балконов.</li>
+                    <li>{t("cat1")}</li>
+                    <li>{t("cat2")}</li>
+                    <li>{t("cat3")}</li>
+                    <li>{t("cat4")}</li>
                 </ul>
-                <p>
-                    Мы стремимся сделать процесс выбора и покупки ковра максимально удобным для вас. Наши консультанты всегда готовы помочь с выбором и ответить на все ваши вопросы.
-                </p>
-                <p>
-                    С нами вы получаете не просто ковер, а настоящее произведение искусства, которое будет радовать вас долгие годы.
-                </p>
-                <p>
-                    Мы верим, что каждый дом заслуживает быть уютным и стильным, и наш магазин поможет воплотить ваши мечты в реальность!
-                </p>
-                <p>
-                    Спасибо, что выбираете нас. Ваш комфорт – наша главная задача!
-                </p>
+                <p>{t("body2")}</p>
+                <p>{t("body3")}</p>
+                <p>{t("body4")}</p>
+                <p>{t("body5")}</p>
             </div>
         </InfoPageLayout>
     );
-}                
+}

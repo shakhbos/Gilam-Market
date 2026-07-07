@@ -8,35 +8,102 @@
     },
     "About": {
         "title": "Biz haqimizda - Gilam Market",
-        "description": "Gilam Market haqida ko'proq bilib oling - O'zbekistonda premium gilamlar yetkazib beruvchi yetakchi kompaniya. Biz Turk, Eron va O'zbek gilamlarining keng tanlovini taklif etamiz."
+        "description": "Gilam Market haqida ko'proq bilib oling - O'zbekistonda premium gilamlar yetkazib beruvchi yetakchi kompaniya. Biz Turk, Eron va O'zbek gilamlarining keng tanlovini taklif etamiz.",
+        "pageTitle": "Biz haqimizda",
+        "body1": "Bizning gilam onlayn do'konimizga xush kelibsiz — bu yerda sifat, uslub va shinamlik uyg'unlashgan! Bizda 100 dan ortiq kolleksiya va 500 dan ortiq gilam modeli mavjud. Turkiya va Erondan yetkazib berilgan premium gilamlar zamonaviy va klassik interyerlar uchun mo'ljallangan.",
+        "categoriesTitle": "Bizning taklif etiladigan toifalarimiz:",
+        "cat1": "Mehmonxona gilamlari — issiq va nafis muhit yaratish uchun",
+        "cat2": "Yotoqxona gilamlari — shinamlik va xilvatlik qo'shadi",
+        "cat3": "Bolalar xonasi gilamlari — bolalaringizga xavfsiz va rangli quvonch",
+        "cat4": "Ko'cha gilamlari — teraslar va balkonlar uchun bardosh va amaliy",
+        "body2": "Sizni gilam tanlash va sotib olish jarayonini maksimal darajada qulay qilishga intilamiz. Bizning maslahatchilarimiz doim tanlashda yordam berishga va barcha savollaringizga javob berishga tayyor.",
+        "body3": "Biz bilan siz shunchaki gilam emas, balki uzoq yillar davomida sizni xursand qiladigan haqiqiy san'at asari olasiz.",
+        "body4": "Har bir uy shinam va nafis bo'lishga loyiq deb ishonamiz — bizning do'konimiz sizning orzularingizni haqiqatga aylantirishga yordam beradi.",
+        "body5": "Bizni tanlaganingiz uchun tashakkur. Sizning qulayligingiz — bizning asosiy vazifamiz!"
     },
     "Delivery": {
         "title": "Yetkazib berish - Gilam Market",
-        "description": "O'zbekiston bo'ylab tez va ishonchli gilam yetkazib berish xizmati. Yetkazib berish shartlari bilan tanishing."
+        "description": "O'zbekiston bo'ylab tez va ishonchli gilam yetkazib berish xizmati. Yetkazib berish shartlari bilan tanishing.",
+        "pageTitle": "Yetkazib berish",
+        "body1": "Gilam onlayn do'konimizdan xaridingiz uchun rahmat. Bizga bo'lgan ishonchingizni qadrlaymiz.",
+        "body2": "Yetkazib berish buyurtma tasdiqlangan kundan boshlab 7 (yetti) kalendar kuni ichida amalga oshiriladi. Har bir buyurtma tegishli holatda va belgilangan muddatda yetib borishi uchun ishlov berish, qadoqlash va tashishni sinchkovlik bilan nazorat qilamiz.",
+        "body3Prefix": "Yetkazib berish tafsilotlarini, manzilni, qulay vaqtni aniqlashtirish yoki qo'shimcha savollar bo'lsa, biz bilan telefon orqali bog'laning:",
+        "body4": "Bizning mutaxassislarimiz sizga barcha kerakli ma'lumotlarni beradi va tez qo'llab-quvvatlaydi.",
+        "body5": "Xaridingizga rahmat va biz sifatli, chidamli gilamlarni yetkazib berishdan mamnunmiz.",
+        "body6": "Uzoq muddatli hamkorlikka umid qilamiz va sizni doimiy mijozlarimiz orasida ko'rishdan xursand bo'lamiz."
     },
     "Payment": {
         "title": "To'lov usullari - Gilam Market",
-        "description": "Gilam Marketda buyurtmalar uchun xavfsiz to'lov usullari. Biz turli xil to'lov shakllarini qabul qilamiz."
+        "description": "Gilam Marketda buyurtmalar uchun xavfsiz to'lov usullari. Biz turli xil to'lov shakllarini qabul qilamiz.",
+        "pageTitle": "To'lov haqida",
+        "body1": "Buyurtma berganingiz uchun rahmat. Sizning tanlovingizni qadrlaymiz va har bir mijoz uchun maksimal shaffof va qulay to'lov shartlarini ta'minlashga intilamiz.",
+        "body2Prefix": "To'lov siz tanlagan usulda amalga oshiriladi. Agar buyurtmada naqd to'lov ko'rsatilgan bo'lsa, mahsulotni olish paytida operatorimiz bilan telefon orqali bog'laning:",
+        "body2Suffix": "Ushbu qo'ng'iroq to'lovning to'g'riligini, buyurtmaning mos kelishini va barcha tafsilotlarini aniqlash uchun zarur.",
+        "body3": "Operator bilan suhbat paytida narx, tovar va to'lov shartlari to'g'ri ko'rsatilganiga ishonch hosil qilishingiz mumkin. Shuningdek, qaytarish va almashtirish qoidalari haqida batafsil ma'lumot olasiz.",
+        "body4": "Kompaniyamiz mijozlar bilan ochiq va halol muomala qilish tamoyillariga sodiq. To'lov jarayoni tushunarli, xavfsiz va qulay bo'lishi uchun barcha imkoniyatlarni yaratamiz.",
+        "body5": "Onlayn do'konimizga bo'lgan ishonchingiz uchun rahmat. Mijozlarga sifatli gilam mahsulotlari va professional xizmat ko'rsatishdan xursandmiz."
     },
     "Account": {
         "title": "Mening hisobim - Gilam Market",
-        "description": "Shaxsiy ma'lumotlaringizni boshqaring va buyurtmalaringizni kuzatib boring."
+        "description": "Shaxsiy ma'lumotlaringizni boshqaring va buyurtmalaringizni kuzatib boring.",
+        "successToast": "Muvaffaqiyatli!",
+        "confirmed": "tasdiqlangan",
+        "firstName": "Ism",
+        "lastName": "Familiya",
+        "verifying": "Tekshirilmoqda...",
+        "confirm": "Tasdiqlash",
+        "consentIntro": "Saytimizda ro'yxatdan o'tish orqali siz bizning",
+        "privacyPolicy": "Maxfiylik siyosati",
+        "consentAnd": "va",
+        "termsOfUse": "Foydalanish shartlari",
+        "consentSuffix": "bilan roziligingizni tasdiqlaysiz.",
+        "consentBody": "Ushbu hujjatlar shaxsiy ma'lumotlaringizni qanday himoya qilishimiz, ma'lumotlarni qanday qayta ishlashimiz va xizmatlarimizdan foydalanish qoidalari haqida muhim ma'lumotlarni o'z ichiga oladi. Ro'yxatdan o'tishni yakunlashdan oldin ular bilan diqqat bilan tanishishni tavsiya etamiz — shaffoflik va xavfsizlikka ishonchingiz komil bo'lsin. Sizning ishonchingiz va ma'lumotlaringiz xavfsizligi — biz uchun ustuvor!"
     },
     "Basket": {
         "title": "Savatcha - Gilam Market",
-        "description": "Tanlangan gilamlarni ko'rib chiqing va xaridni yakunlang."
+        "description": "Tanlangan gilamlarni ko'rib chiqing va xaridni yakunlang.",
+        "customer": "Xaridor",
+        "notRegistered": "Ro'yxatdan o'tmagan",
+        "contactPhone": "Aloqa uchun raqam",
+        "change": "O'zgartirish",
+        "checkout": "Buyurtma berish",
+        "empty": "Savatcha bo'sh"
     },
     "Likes": {
         "title": "Saralanganlar - Gilam Market",
-        "description": "Sizga yoqqan barcha gilamlar bir joyda."
+        "description": "Sizga yoqqan barcha gilamlar bir joyda.",
+        "empty": "Saralanganlar yo'q"
     },
     "MyOrders": {
         "title": "Buyurtmalarim - Gilam Market",
-        "description": "Barcha amalga oshirilgan va joriy buyurtmalar tarixi."
+        "description": "Barcha amalga oshirilgan va joriy buyurtmalar tarixi.",
+        "orderNumber": "Buyurtma raqami",
+        "orderStatus": "Buyurtma holati",
+        "deliveryDate": "Yetkazish sanasi",
+        "prepayment": "Oldindan to'lov",
+        "remaining": "Qolgan",
+        "questionsTitle": "Savollaringiz bo'lsa",
+        "questionsBody": "Buyurtma tafsilotlari haqida bilmoqchi bo'lsangiz, operatorlarimizga telefon orqali bog'laning."
     },
     "Order": {
         "title": "Buyurtma berish - Gilam Market",
-        "description": "Buyurtmani rasmiylashtirish va yetkazib berish manzilini kiritish."
+        "description": "Buyurtmani rasmiylashtirish va yetkazib berish manzilini kiritish.",
+        "cartCheckout": "Savatcha | Buyurtmani rasmiylashtirish",
+        "paymentType": "To'lov turi",
+        "cash": "Naqd",
+        "payme": "PAYME",
+        "click": "CLICK",
+        "comment": "Izoh",
+        "commentPlaceholder": "Yetkazishga oid izohlaringiz",
+        "date": "Sana",
+        "time": "Vaqt",
+        "addressLabel": "Yetkazish manzili",
+        "addressPlaceholder": "Ko'cha, uy, mo'ljal, xonadon raqami",
+        "addressWarning": "Yetkazish manzilining to'g'riligini tekshiring. Buyurtma berilgach manzilni o'zgartirib bo'lmaydi.",
+        "submit": "Buyurtmani yuborish",
+        "submitting": "Yuborilmoqda...",
+        "failed": "Buyurtma yuborilmadi",
+        "success": "Buyurtma yuborildi!"
     },
     "Layout": {
         "menu": "Menyu",
@@ -46,6 +113,25 @@
         "login": "Kirish",
         "cart": "Savatcha",
         "likes": "Saralanganlar"
+    },
+    "Menu": {
+        "companyTagline": "Onlayn internet do'kon",
+        "aboutLink": "Biz haqimizda",
+        "deliveryLink": "Yetkazib berish",
+        "paymentLink": "To'lov haqida",
+        "contactsTitle": "Aloqa",
+        "addressLabel": "Manzil",
+        "addressValue": "Parkent ko'chasi, 131 A",
+        "phoneLabel": "Telefon",
+        "categoryLivingRoom": "Mehmonxona uchun",
+        "categoryBedroom": "Yotoqxona uchun",
+        "categoryKids": "Bolalar uchun",
+        "categoryKitchen": "Oshxona uchun",
+        "categoryHallway": "Dahliz uchun",
+        "categoryOffice": "Ofis uchun",
+        "categoryCabinet": "Kabinet uchun",
+        "categoryStairs": "Zinapoya uchun",
+        "categoryOutdoor": "Ko'cha gilamlari"
     },
     "Home": {
         "heroTitle": "Nafislik olamiga sho'ng'ing!",
@@ -66,6 +152,32 @@
         "inStock": "{count} ta mavjud",
         "outOfStock": "Sotuvda yo'q",
         "priceLabel": "Narxi"
+    },
+    "Auth": {
+        "signInTitle": "Ro'yxatdan o'tish yoki Kirish",
+        "phonePlaceholder": "+998 XX XXX-XX-XX",
+        "phoneMissing": "Telefon raqamni kiriting",
+        "codeSent": "SMS kod yuborildi",
+        "codePlaceholder": "SMS kod",
+        "codeMissing": "SMS kodni kiriting",
+        "registered": "Muvaffaqiyatli ro'yxatdan o'tildi",
+        "sendCode": "Kod yuborish",
+        "verify": "Tasdiqlash",
+        "sending": "Yuborilmoqda..."
+    },
+    "Location": {
+        "openOnMap": "Xaritada ko'rsatish",
+        "modalTitle": "Manzilingizni tanlang",
+        "confirm": "Tasdiqlash",
+        "cancel": "Bekor qilish"
+    },
+    "Profile": {
+        "myOrders": "Buyurtmalarim",
+        "account": "Hisobim",
+        "basket": "Savatcha",
+        "likes": "Saralanganlar",
+        "logout": "Chiqish",
+        "logoutConfirm": "Rostdan ham chiqmoqchimisiz?"
     },
     "NotFound": {
         "title": "Sahifa topilmadi",

@@ -1,38 +1,40 @@
 import InfoPageLayout from "../../../components/info-page-layout";
-import { getTranslations } from 'next-intl/server';
-import type { Metadata } from 'next';
-import type { MetadataProps } from '@/types/next';
-import { localizedAlternates } from '@/utils/metadata';
+import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
+import type { MetadataProps, PageProps } from "@/types/next";
+import { localizedAlternates } from "@/utils/metadata";
+
+const CONTACT_TEL = "+998946093444";
+const CONTACT_TEL_DISPLAY = "+998 94 609 34 44";
 
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
     const { locale } = await params;
-    const t = await getTranslations({ locale, namespace: 'Payment' });
+    const t = await getTranslations({ locale, namespace: "Payment" });
     return {
-        title: t('title'),
-        description: t('description'),
-        alternates: localizedAlternates(locale, '/payment'),
+        title: t("title"),
+        description: t("description"),
+        alternates: localizedAlternates(locale, "/payment"),
     };
 }
 
-export default function PaymentPage() {
+export default async function PaymentPage({ params }: PageProps) {
+    const { locale } = await params;
+    const t = await getTranslations({ locale, namespace: "Payment" });
+
     return (
-        <InfoPageLayout title="Об оплате">
+        <InfoPageLayout title={t("pageTitle")}>
             <div className="flex flex-col gap-6 text-[14px] md:text-[16px] leading-[20px] md:leading-[24px] text-[#212121]">
+                <p>{t("body1")}</p>
                 <p>
-                    Благодарим вас за оформление заказа в нашем интернет-магазине ковров. Мы высоко ценим ваш выбор и стремимся обеспечить максимально прозрачные и удобные условия оплаты для каждого клиента.
+                    {t("body2Prefix")}{" "}
+                    <a href={`tel:${CONTACT_TEL}`} className="text-blue-600 hover:underline">
+                        {CONTACT_TEL_DISPLAY}
+                    </a>
+                    . {t("body2Suffix")}
                 </p>
-                <p>
-                    Оплата заказов осуществляется в соответствии с выбранным вами способом при оформлении покупки. В случае если в заказе указана оплата наличными при получении, просим вас обязательно связаться с нашим оператором в момент получения товара у доставщика по телефону: <a href="tel:+998946093444" className="text-blue-600 hover:underline">+998 94 609 34 44</a>. Данный звонок необходим для подтверждения корректности оплаты, проверки соответствия заказа и уточнения всех деталей непосредственно в момент передачи товара.
-                </p>
-                <p>
-                    Во время разговора с оператором вы сможете убедиться, что сумма, товар и условия оплаты указаны верно, а также получить подробную информацию о сроках возврата, правилах возврата и обмена продукции. Мы рекомендуем уточнять эти условия заранее, чтобы избежать возможных недоразумений в дальнейшем.
-                </p>
-                <p>
-                    Наша компания придерживается принципов открытости и честного взаимодействия с клиентами. Мы делаем всё возможное, чтобы процесс оплаты был понятным, безопасным и комфортным, а также соответствовал установленным правилам и стандартам обслуживания.
-                </p>
-                <p>
-                    Благодарим вас за доверие к нашему интернет-магазину. Мы рады возможности предоставлять нашим клиентам качественные ковровые изделия и профессиональный сервис. Надеемся, что сотрудничество с нами оставит у вас только положительные впечатления.
-                </p>
+                <p>{t("body3")}</p>
+                <p>{t("body4")}</p>
+                <p>{t("body5")}</p>
             </div>
         </InfoPageLayout>
     );

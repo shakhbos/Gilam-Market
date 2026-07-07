@@ -1,55 +1,141 @@
 {
     "lang": "en",
     "Metadata": {
-        "title": "Gilam Market - Premium Carpets in Uzbekistan",
-        "description": "Buy premium quality Turkish, Iranian, and Uzbek carpets at Gilam Market. Wide range of sizes, modern and classic designs with delivery across Uzbekistan.",
-        "ogTitle": "Gilam Market - Premium Carpets & Rugs Online",
-        "ogDescription": "Discover the best collection of carpets in Uzbekistan. Turkish, Iranian, and local designs available for online purchase with home delivery."
+        "title": "Gilam Market - Premium carpets in Uzbekistan",
+        "description": "Buy premium Turkish, Iranian and Uzbek carpets at Gilam Market. Wide range of sizes and modern or classic designs, delivered across Uzbekistan.",
+        "ogTitle": "Gilam Market - Premium carpets and runners online",
+        "ogDescription": "Discover Uzbekistan's best carpet collection. Turkish, Iranian, and locally made designs available online with home delivery."
     },
     "About": {
-        "title": "About Us - Gilam Market",
-        "description": "Learn more about Gilam Market, the leading provider of premium carpets in Uzbekistan. We offer a wide selection of Turkish, Iranian, and Uzbek rugs."
+        "title": "About us - Gilam Market",
+        "description": "Learn more about Gilam Market — a leading supplier of premium carpets in Uzbekistan offering a wide selection of Turkish, Iranian and Uzbek rugs.",
+        "pageTitle": "About us",
+        "body1": "Welcome to our online carpet store — a place where quality, style and cosiness meet. We carry over 100 collections and 500 carpet models. Premium rugs from Turkey and Iran suit both modern and classical interiors.",
+        "categoriesTitle": "Categories we offer:",
+        "cat1": "Living room carpets — to create a warm and stylish atmosphere",
+        "cat2": "Bedroom carpets — for extra cosiness and privacy",
+        "cat3": "Kids' carpets — safe and colourful to delight your children",
+        "cat4": "Outdoor carpets — durable and practical for terraces and balconies",
+        "body2": "We strive to make choosing and buying a carpet as convenient as possible. Our consultants are always ready to help and answer any questions.",
+        "body3": "With us you get more than a rug — a true piece of art that will delight you for years.",
+        "body4": "We believe every home deserves to be cosy and stylish, and our store helps turn your dreams into reality.",
+        "body5": "Thank you for choosing us. Your comfort is our top priority!"
     },
     "Delivery": {
-        "title": "Delivery Information - Gilam Market",
-        "description": "Fast and reliable carpet delivery across Uzbekistan. Check our delivery terms and conditions."
+        "title": "Delivery - Gilam Market",
+        "description": "Fast and reliable carpet delivery across Uzbekistan. Read our delivery terms.",
+        "pageTitle": "About delivery",
+        "body1": "Thank you for shopping at our online carpet store. We truly appreciate your trust.",
+        "body2": "Delivery of your carpet takes place within 7 (seven) calendar days from order confirmation. We carefully oversee processing, packaging and transportation so every order arrives in proper condition and on time.",
+        "body3Prefix": "If you need to clarify delivery details, address, convenient time or have any additional questions, please contact us:",
+        "body4": "Our specialists will provide the required information and offer prompt support.",
+        "body5": "Thank you for choosing our store. We are confident your rugs will delight you with their quality, design and durability.",
+        "body6": "We look forward to a long-term partnership and are happy to welcome you among our regular customers."
     },
     "Payment": {
-        "title": "Payment Methods - Gilam Market",
-        "description": "Secure payment options for your carpet orders at Gilam Market. We accept various payment methods."
+        "title": "Payment - Gilam Market",
+        "description": "Secure payment methods for orders at Gilam Market. We accept various forms of payment.",
+        "pageTitle": "About payment",
+        "body1": "Thank you for placing an order at our online carpet store. We appreciate your choice and strive to keep payment conditions transparent and convenient for every customer.",
+        "body2Prefix": "Payment is processed according to the method you chose. If the order lists cash on delivery, please call our operator at the time of receiving the goods:",
+        "body2Suffix": "This call confirms the correctness of payment, verifies the order and clarifies any details.",
+        "body3": "During the call with the operator you can verify that the amount, product and payment terms are correct, and receive information about return and exchange rules.",
+        "body4": "Our company adheres to openness and honest interaction with customers. We do everything we can so the payment process is clear, safe and comfortable.",
+        "body5": "Thank you for trusting our online store. We are glad to offer our customers quality carpet products and professional service."
     },
     "Account": {
-        "title": "My Account - Gilam Market",
-        "description": "Manage your personal information and track your orders."
+        "title": "My account - Gilam Market",
+        "description": "Manage personal details and track your orders.",
+        "successToast": "Success!",
+        "confirmed": "confirmed",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "verifying": "Verifying...",
+        "confirm": "Confirm",
+        "consentIntro": "By registering on our site, you confirm your agreement with our",
+        "privacyPolicy": "Privacy Policy",
+        "consentAnd": "and",
+        "termsOfUse": "Terms of Use",
+        "consentSuffix": ".",
+        "consentBody": "These documents contain important information about how we protect your personal data, process information and govern the use of our service. We recommend reading them carefully before completing registration to be sure of the transparency and security of our interaction. Your trust and the protection of your data are our priority!"
     },
     "Basket": {
-        "title": "Cart - Gilam Market",
-        "description": "Review your selected carpets and complete your purchase."
+        "title": "Basket - Gilam Market",
+        "description": "Review the carpets you selected and complete your purchase.",
+        "customer": "Customer",
+        "notRegistered": "Not registered",
+        "contactPhone": "Contact phone",
+        "change": "Change",
+        "checkout": "Checkout",
+        "empty": "Basket is empty"
     },
     "Likes": {
-        "title": "Favorites - Gilam Market",
-        "description": "All your favorite carpets in one place."
+        "title": "Favourites - Gilam Market",
+        "description": "All the carpets you liked in one place.",
+        "empty": "No favourites yet"
     },
     "MyOrders": {
-        "title": "My Orders - Gilam Market",
-        "description": "History of all completed and current orders."
+        "title": "My orders - Gilam Market",
+        "description": "History of all completed and pending orders.",
+        "orderNumber": "Order number",
+        "orderStatus": "Order status",
+        "deliveryDate": "Delivery date",
+        "prepayment": "Prepayment",
+        "remaining": "Remaining",
+        "questionsTitle": "For clarifications",
+        "questionsBody": "If you want to know more about your order, contact our operators by phone."
     },
     "Order": {
         "title": "Checkout - Gilam Market",
-        "description": "Complete your order and enter delivery address."
+        "description": "Place your order and enter the delivery address.",
+        "cartCheckout": "Basket | Checkout",
+        "paymentType": "Payment type",
+        "cash": "Cash",
+        "payme": "PAYME",
+        "click": "CLICK",
+        "comment": "Comment",
+        "commentPlaceholder": "Any notes for delivery",
+        "date": "Date",
+        "time": "Time",
+        "addressLabel": "Delivery address",
+        "addressPlaceholder": "Street, building, landmark, apartment",
+        "addressWarning": "Please double-check the delivery address. Once the order is placed, changing the address is not possible.",
+        "submit": "Submit order",
+        "submitting": "Sending...",
+        "failed": "Order failed",
+        "success": "Order sent!"
     },
     "Layout": {
         "menu": "Menu",
         "search": "Search",
         "filter": "Filter",
         "profile": "Profile",
-        "login": "Login",
+        "login": "Log in",
         "cart": "Cart",
-        "likes": "Favorites"
+        "likes": "Favourites"
+    },
+    "Menu": {
+        "companyTagline": "Online internet store",
+        "aboutLink": "About us",
+        "deliveryLink": "Delivery",
+        "paymentLink": "Payment",
+        "contactsTitle": "Contacts",
+        "addressLabel": "Address",
+        "addressValue": "Parkent Str., 131 A",
+        "phoneLabel": "Phone",
+        "categoryLivingRoom": "Living room",
+        "categoryBedroom": "Bedroom",
+        "categoryKids": "Kids",
+        "categoryKitchen": "Kitchen",
+        "categoryHallway": "Hallway",
+        "categoryOffice": "Office",
+        "categoryCabinet": "Cabinet",
+        "categoryStairs": "Stairs",
+        "categoryOutdoor": "Outdoor"
     },
     "Home": {
-        "heroTitle": "Dive into the world of sophistication!",
-        "heroSubtitle": "Turkish, Iranian, and Uzbek carpets - only premium quality and affordable prices.",
+        "heroTitle": "Dive into a world of elegance!",
+        "heroSubtitle": "Turkish, Iranian and Uzbek carpets — only premium quality at affordable prices.",
         "searchResults": "Search results for \"{query}\""
     },
     "Product": {
@@ -66,6 +152,32 @@
         "inStock": "{count} in stock",
         "outOfStock": "Out of stock",
         "priceLabel": "Price"
+    },
+    "Auth": {
+        "signInTitle": "Sign up or Log in",
+        "phonePlaceholder": "+998 XX XXX-XX-XX",
+        "phoneMissing": "Please enter your phone number",
+        "codeSent": "SMS code sent",
+        "codePlaceholder": "SMS code",
+        "codeMissing": "Please enter the SMS code",
+        "registered": "Successfully registered",
+        "sendCode": "Send code",
+        "verify": "Verify",
+        "sending": "Sending..."
+    },
+    "Location": {
+        "openOnMap": "Show on map",
+        "modalTitle": "Choose your location",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
+    },
+    "Profile": {
+        "myOrders": "My orders",
+        "account": "Account",
+        "basket": "Basket",
+        "likes": "Favourites",
+        "logout": "Log out",
+        "logoutConfirm": "Are you sure you want to log out?"
     },
     "NotFound": {
         "title": "Page Not Found",

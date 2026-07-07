@@ -3,6 +3,7 @@ import { useAppSelector } from "@/lib/hooks";
 import { fetchData } from "@/service/get";
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import { useTranslations } from "next-intl";
 import GlamCardBusket from "@/components/gllam-card-busket";
 import { minio_img_url } from "@/utils/divice";
 
@@ -21,6 +22,7 @@ function HeaderItem({ title, value }) {
   )
 }
 export default function MyOrdersPage() {
+  const t = useTranslations("MyOrders");
   const { token } = useAppSelector((store) => store.token);
   const [myOrder, setMyOrder] = useState<any>([]);
   useEffect(() => {
@@ -54,11 +56,11 @@ export default function MyOrdersPage() {
               {dayjs(item?.startDate)?.format("DD MMMM YYYY HH:mm")}
             </p>
             <div className="flex px-[14px] py-[10px] gap-4 sm:gap-1 border-[#EEEEEE] my-[10px] border overflow-x-auto scrollbar-hide">
-              <div className="min-w-[100px] w-full"><HeaderItem title="Номер заказа" value={"№" + item?.sequence} /></div>
-              <div className="min-w-[100px] w-full"><HeaderItem title="Статус заказа" value={item?.order_status} /></div>
-              <div className="min-w-[120px] w-full"><HeaderItem title="Дата доставки" value={item?.date} /></div>
-              <div className="min-w-[100px] w-full"><HeaderItem title="Предоплата" value={item?.pre_payment} /></div>
-              <div className="min-w-[100px] w-full"><HeaderItem title="Осталось" value={Number(item?.totalPrice) - Number(item?.pre_payment)} /></div>
+              <div className="min-w-[100px] w-full"><HeaderItem title={t("orderNumber")} value={"№" + item?.sequence} /></div>
+              <div className="min-w-[100px] w-full"><HeaderItem title={t("orderStatus")} value={item?.order_status} /></div>
+              <div className="min-w-[120px] w-full"><HeaderItem title={t("deliveryDate")} value={item?.date} /></div>
+              <div className="min-w-[100px] w-full"><HeaderItem title={t("prepayment")} value={item?.pre_payment} /></div>
+              <div className="min-w-[100px] w-full"><HeaderItem title={t("remaining")} value={Number(item?.totalPrice) - Number(item?.pre_payment)} /></div>
             </div>
             {item?.client_order_items?.length
               ? item?.client_order_items?.map((e) => (
@@ -78,11 +80,10 @@ export default function MyOrdersPage() {
       </div>
       <div className="w-full sm:max-w-[270px]">
         <p className="text-[20px] leading-[23.4px] text-[#212121] font-bold mb-[15px]">
-          Для уточнений
+          {t("questionsTitle")}
         </p>
         <p className="text-[12px] leading-[14.4px] text-[#212121]">
-          Если вы хотите узнать подробности о вашем заказе, свяжитесь с нашими
-          операторами по телефону.
+          {t("questionsBody")}
         </p>
       </div>
     </div>

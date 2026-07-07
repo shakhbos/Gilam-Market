@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useAppDispatch, useAppSelector } from "../lib/hooks";
 import { changeBuskets } from "../lib/features";
 import GlamCardBusket from "../components/gllam-card-busket";
@@ -9,6 +10,7 @@ import { formatUzPhone } from "@/lib/formatUzPhone";
 import { minio_img_url } from "@/utils/divice";
 
 export default function BusketPage() {
+  const t = useTranslations("Basket");
   const { buskets } = useAppSelector((store) => store.buskets);
   const { userMe } = useAppSelector((store) => store.userMe);
   const dispatch = useAppDispatch();
@@ -48,18 +50,15 @@ export default function BusketPage() {
           : ""}
       </div>
       <div className="w-full sm:max-w-[270px] flex-shrink-0">
-        <p className="text-[12px] leading-[14.4px] text-[#212121]">Заказчик</p>
+        <p className="text-[12px] leading-[14.4px] text-[#212121]">{t("customer")}</p>
         <p className="text-[20px] leading-[23.4px] text-[#212121] mt-[6px] mb-[24px]">
-          {userMe ? userMe?.login : "Не ригистрирован"}
+          {userMe ? userMe?.login : t("notRegistered")}
         </p>
 
         <div className="items-center w-full mb-2 flex justify-between">
           <p className="text-[12px] leading-[14.4px] text-[#212121]">
-            Номер для связи
+            {t("contactPhone")}
           </p>
-          {/* <p className="text-[12px] leading-[14.4px] text-[#006BD6]">
-            Изменить
-          </p> */}
         </div>
 
         <input
@@ -85,7 +84,7 @@ export default function BusketPage() {
             : "border-[#EEEEEE] border-[1px] border-solid"
             } py-[11px] cursor-pointer text-center inline-block w-full mt-[30px]  px-[12px] `}
         >
-          Оформить заказ
+          {t("checkout")}
         </button>
       </div>
 

@@ -6,8 +6,10 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { getDetailedDeviceName } from "@/utils/divice";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useTranslations } from "next-intl";
 
 export default function AcountPage() {
+  const t = useTranslations("Account");
   const [openChnagePhone, setOpenChnagePhone] = useState(false);
   const { userMe } = useAppSelector((store) => store.userMe);
   const { token } = useAppSelector((store) => store.token);
@@ -55,7 +57,7 @@ export default function AcountPage() {
           dispatch(changeUserMe({ ...userMe, ...res }));
           setFirstName(res?.firstName);
           setLastName(res?.lastName);
-          toast("успешно");
+          toast(t("successToast"));
         });
     } catch (e) {
     } finally {
@@ -79,27 +81,27 @@ export default function AcountPage() {
           <EditIcons />
         </span>
         <p className="text-[#212121] opacity-30 text-[12px] leading-[18px]">
-          подтержден
+          {t("confirmed")}
         </p>
       </div>
       <div className="flex flex-col sm:flex-row sm:items-end gap-4 max-w-[596px] mt-[41px] mb-[48px]">
         <div className="w-full">
-          <p className="mb-2 text-[14px] leading-[16px]">Имя</p>
+          <p className="mb-2 text-[14px] leading-[16px]">{t("firstName")}</p>
 
           <input
             value={firstName || ""}
             onChange={(e) => setFirstName(e.target.value)}
-            placeholder="Имя"
+            placeholder={t("firstName")}
             className="py-[11px] w-full px-[12px] outline-none border"
           />
         </div>
         <div className="w-full">
-          <p className="mb-2 text-[14px] leading-[16px]">Фамилия</p>
+          <p className="mb-2 text-[14px] leading-[16px]">{t("lastName")}</p>
 
           <input
             value={lastName || ""}
             onChange={(e) => setLastName(e.target.value)}
-            placeholder="Фамилия"
+            placeholder={t("lastName")}
             className="py-[11px] w-full px-[12px] outline-none border"
           />
         </div>
@@ -108,7 +110,7 @@ export default function AcountPage() {
           disabled={loading}
           className="bg-black h-12 text-white px-[40px] w-full sm:w-auto flex-shrink-0"
         >
-          {loading ? "Проверка..." : "Подтвердить"}
+          {loading ? t("verifying") : t("confirm")}
         </button>
       </div>
       <p className="text-[14px] leading-[20px] text-[#212121]">ip device: </p>
@@ -118,24 +120,20 @@ export default function AcountPage() {
       {/* <p className='text-[14px] leading-[20px] text-[#212121] mt-5'>location registry:  </p>
           <p className='text-[14px] leading-[20px] text-[#212121] opacity-40'>c.Tashkent. str.Yuganik l:892423 sh:29832</p> */}
 
-      <p className="mt-[50px] w-full text-[#21212173]  max-w-[474px] text-[12px] leading-[15px]">
+      <div className="mt-[50px] w-full text-[#21212173] max-w-[474px] text-[12px] leading-[15px]">
         <p className="mb-[10px]">
-          Регистрируясь на нашем сайте, вы подтверждаете свое согласие с нашей
+          {t("consentIntro")}{" "}
           <span className="font-medium text-[#349AFF]">
-            Политикой конфиденциальности
-          </span>
-          и
+            {t("privacyPolicy")}
+          </span>{" "}
+          {t("consentAnd")}{" "}
           <span className="font-medium text-[#349AFF]">
-            Условиями использования.
+            {t("termsOfUse")}
           </span>
+          {t("consentSuffix")}
         </p>
-        Эти документы содержат важную информацию о том, как мы защищаем ваши
-        персональные данные, обрабатываем информацию и регулируем использование
-        нашего сервиса. Мы рекомендуем вам внимательно ознакомиться с ними перед
-        завершением регистрации, чтобы быть уверенными в прозрачности и
-        безопасности нашего взаимодействия. Ваше доверие и защита ваших данных
-        для нас приоритетны!
-      </p>
+        <p>{t("consentBody")}</p>
+      </div>
     </div>
   );
 }
