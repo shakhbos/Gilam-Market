@@ -1,8 +1,11 @@
 import { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
 import { fetchData } from "@/service/get";
 import HomePage from "@/views/home";
 import { SITE_URL } from "@/utils/seo";
+import { localizedAlternates } from "@/utils/metadata";
+import type { PageProps } from "@/types/next";
 import type { PaginatedResponse, QrBaseProduct } from "@/types/api";
 
 type HomeSearchParams = {
@@ -14,9 +17,17 @@ type HomeSearchParams = {
   length?: string;
 };
 
-export const metadata: Metadata = {
-  title: "Gilam Market",
-};
+export async function generateMetadata({
+  params,
+}: PageProps<{ locale: string }, HomeSearchParams>): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Metadata" });
+  return {
+    title: t("title") || "Gilam Market",
+    description: t("description") || undefined,
+    alternates: localizedAlternates(locale, "/"),
+  };
+}
 
 export default async function Home({
   searchParams,

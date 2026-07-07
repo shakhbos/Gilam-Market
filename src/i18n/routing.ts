@@ -1,30 +1,21 @@
 import { defineRouting } from "next-intl/routing";
 import { createNavigation } from "next-intl/navigation";
 
+/**
+ * next-intl routing config. Barcha useLocale / Link / usePathname / useRouter
+ * shu joydan chiqadi — route hookslarni `next/navigation`'dan to'g'ridan-to'g'ri
+ * chaqirmang, aks holda locale segmenti yo'qoladi.
+ *
+ * Progress bar (nextjs-toploader) `[locale]/layout.tsx`da o'rnatilgan —
+ * route almashishida avtomatik ishlaydi, shuning uchun bu joyda NProgress
+ * qo'lda chaqirilmaydi.
+ */
 export const routing = defineRouting({
   locales: ["en", "ru", "uz"],
-
   defaultLocale: "ru",
 });
 
 const navigation = createNavigation(routing);
 
-export const { Link, redirect, usePathname, getPathname } = navigation;
-
-import NProgress from "nprogress";
-
-export const useRouter = () => {
-  const router = navigation.useRouter();
-
-  return {
-    ...router,
-    push: (...args: Parameters<typeof router.push>) => {
-      NProgress.start();
-      return router.push(...args);
-    },
-    replace: (...args: Parameters<typeof router.replace>) => {
-      NProgress.start();
-      return router.replace(...args);
-    },
-  };
-};
+export const { Link, redirect, usePathname, getPathname, useRouter } =
+  navigation;

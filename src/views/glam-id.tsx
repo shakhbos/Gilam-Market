@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Image as AntImage } from "antd";
-import NextImage from "next/image";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { toast } from "react-toastify";
 import Masonry from "react-masonry-css";
@@ -94,7 +93,7 @@ export default function GlamById({ product, relatedProducts }: Props) {
         <div className="flex flex-col-reverse lg:flex-row w-full gap-4 max-w-full lg:max-w-[620px]">
           <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-visible w-full lg:w-[81px] pb-2 lg:pb-0 no-scrollbar">
             {imageUrl && (
-              <NextImage
+              <Image
                 src={imageUrl}
                 width={81}
                 height={100}
@@ -106,17 +105,19 @@ export default function GlamById({ product, relatedProducts }: Props) {
 
           {imageUrl ? (
             <div className="relative w-full flex items-center justify-center aspect-[6/4] lg:aspect-[4/4] lg:max-h-[740px] rounded-lg overflow-hidden bg-[#fcfcfc]">
-              <AntImage
+              <Image
                 src={imageUrl}
-                width={500}
-                height="100%"
+                width={800}
+                height={800}
                 className="object-contain w-full h-full"
                 alt={modelTitle || "Product main image"}
+                priority
+                sizes="(max-width: 768px) 100vw, 620px"
               />
             </div>
           ) : (
             <div className="flex items-center aspect-[3/4] sm:aspect-[2/3] w-full max-w-full lg:max-w-[500px] bg-[#F0F0E5] justify-center rounded-lg">
-              <NextImage
+              <Image
                 src="/empty-folder.png"
                 width={60}
                 height={60}

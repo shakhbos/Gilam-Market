@@ -2,14 +2,15 @@ import InfoPageLayout from "../../../components/info-page-layout";
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
 import type { MetadataProps } from '@/types/next';
+import { localizedAlternates } from '@/utils/metadata';
 
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
     const { locale } = await params;
     const t = await getTranslations({ locale, namespace: 'About' });
-
     return {
         title: t('title'),
-        description: t('description')
+        description: t('description'),
+        alternates: localizedAlternates(locale, '/about'),
     };
 }
 
