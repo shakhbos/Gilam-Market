@@ -12,8 +12,14 @@ import { minio_img_url } from "@/utils/divice";
 import { fetchData } from "../service/get";
 import GlamCardSkeleton from "../components/skeletons/glam-card-skeleton";
 import { useTranslations } from "next-intl";
+import type { PaginatedResponse, QrBaseProduct } from "@/types/api";
 
-export default function HomePage({ product, search }: { product: any, search?: any }) {
+interface HomePageProps {
+  product: QrBaseProduct[];
+  search?: string;
+}
+
+export default function HomePage({ product, search }: HomePageProps) {
   const t = useTranslations('Home');
   const { buskets } = useAppSelector((store) => store.buskets);
   const { likes } = useAppSelector((store) => store.likes);
@@ -30,7 +36,7 @@ export default function HomePage({ product, search }: { product: any, search?: a
     768: 2,
   };
 
-  const [products, setProducts] = useState<any[]>(product || []);
+  const [products, setProducts] = useState<QrBaseProduct[]>(product || []);
   const [page, setPage] = useState(2);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -57,17 +63,15 @@ export default function HomePage({ product, search }: { product: any, search?: a
   const loadMore = async () => {
     setLoading(true);
     try {
-      const res = await fetchData(`${process.env.NEXT_PUBLIC_URL}/qr-base/i-market`, {
-        page: page,
-        limit: 10,
-        status: "published",
-        search: search || undefined,
-        // style: searchParams.get('style') || undefined,
-        // shape: searchParams.get('shape') || undefined,
-        // color: searchParams.get('color') || undefined,
-        // width: searchParams.get('width') || undefined,
-        // length: searchParams.get('length') || undefined,
-      });
+      const res = await fetchData<PaginatedResponse<QrBaseProduct>>(
+        `${process.env.NEXT_PUBLIC_URL}/qr-base/i-market`,
+        {
+          page,
+          limit: 10,
+          status: "published",
+          search: search || undefined,
+        },
+      );
 
       if (res?.items?.length) {
         setProducts((prev) => [...prev, ...res.items]);

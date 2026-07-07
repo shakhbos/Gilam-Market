@@ -60,7 +60,12 @@
         "like": "Liked",
         "share": "Share",
         "noImage": "No Image",
-        "paymentDeliveryInfo": "Contact us for more information."
+        "paymentDeliveryInfo": "Contact us for more information.",
+        "linkCopied": "Link copied!",
+        "availableSizes": "Available sizes",
+        "inStock": "{count} in stock",
+        "outOfStock": "Out of stock",
+        "priceLabel": "Price"
     },
     "NotFound": {
         "title": "Page Not Found",

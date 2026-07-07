@@ -1,81 +1,184 @@
-import { fetchData } from "@/service/get";
-import GlamById from "../../../../views/glam-id";
-import { Metadata, ResolvingMetadata } from 'next';
-import { SITE_URL } from "@/utils/seo";
-import { minio_img_url } from "@/utils/divice";
+import { cache } from "react";
+import type { Metadata, ResolvingMetadata } from "next";
+import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
-async function getSingleProduct(id: string) {
-  return fetchData(`${process.env.NEXT_PUBLIC_URL}/qr-base/i-market/${id}`);
-}
-async function getProduct({ search, productId }: { search: string, productId: string }) {
-  return fetchData(`${process.env.NEXT_PUBLIC_URL}/qr-base/i-market`, {
-    page: 1,
-    limit: 20,
-    status: "published",
-    search,
-    productId
-  });
+import { fetchData } from "@/service/get";
+import { minio_img_url } from "@/utils/divice";
+import { SITE_URL } from "@/utils/seo";
+import BreadcrumbSchema from "@/components/breadcrumb-schema";
+import GlamById from "@/views/glam-id";
+import type { PaginatedResponse, QrBaseProduct } from "@/types/api";
+
+type LocaleParams = { id: string; locale: string };
+type GlamSearchParams = {
+  modelId?: string;
+  color?: string;
+  collectionId?: string;
+};
+
+/**
+ * Bitta QrBase mahsulotini olib keladi. `cache()` React 19 helper — bir
+ * render davomida `generateMetadata` va sahifa komponenti bir marta chaqiradi.
+ */
+const getSingleProduct = cache(
+  async (id: string): Promise<QrBaseProduct | null> =>
+    fetchData<QrBaseProduct>(
+      `${process.env.NEXT_PUBLIC_URL}/qr-base/i-market/${id}`,
+    ),
+);
+
+/**
+ * "Shu mahsulotdan boshqa" — o'xshash productlarni katalog qidiruvi orqali
+ * olamiz. Backend `productId` param'ini ignore qiladi (whitelist uchun kerak),
+ * ishlaydigan filter — `search` (multi-word).
+ */
+async function getRelatedProducts(params: {
+  search: string;
+  productId: string;
+}): Promise<QrBaseProduct[]> {
+  const data = await fetchData<PaginatedResponse<QrBaseProduct>>(
+    `${process.env.NEXT_PUBLIC_URL}/qr-base/i-market`,
+    {
+      page: 1,
+      limit: 20,
+      status: "published",
+      search: params.search,
+      productId: params.productId,
+    },
+  );
+  return data?.items ?? [];
 }
 
 export async function generateMetadata(
-  { params }: { params: Promise<{ id: string }> },
-  parent: ResolvingMetadata
+  { params }: { params: Promise<LocaleParams> },
+  parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  const { id } = await params;
+  const { id, locale } = await params;
   const product = await getSingleProduct(id);
 
-  const previousImages = (await parent).openGraph?.images || [];
+  if (!product) {
+    return { title: "Mahsulot topilmadi | Gilam Market" };
+  }
+
+  const parentMeta = await parent;
+  const previousImages = parentMeta.openGraph?.images || [];
+
+  const modelTitle = product.model?.title ?? "";
+  const collectionTitle =
+    product.collection?.internetTitle?.trim() ||
+    product.collection?.title ||
+    "";
+
+  const title =
+    [modelTitle, collectionTitle].filter(Boolean).join(" — ") || "Gilam";
+  const description =
+    product.internetInfo?.trim() ||
+    `${collectionTitle} kolleksiyasidagi ${modelTitle} modeli — Gilam Market.`;
+
+  const canonicalUrl = `${SITE_URL}/${locale}/glam/${id}`;
+  const heroImage = product.imgUrl?.path
+    ? `${minio_img_url}${product.imgUrl.path}`
+    : undefined;
 
   return {
-    title: `${product[0]?.model?.title || ''} ${product[0]?.collection?.title || ''}`,
-    description: product[0]?.internetInfo || 'Product details',
+    title,
+    description,
+    alternates: {
+      canonical: canonicalUrl,
+      languages: {
+        uz: `${SITE_URL}/uz/glam/${id}`,
+        ru: `${SITE_URL}/ru/glam/${id}`,
+        en: `${SITE_URL}/en/glam/${id}`,
+      },
+    },
     openGraph: {
-      images: product[0]?.imgUrl?.path ? [`${minio_img_url}${product[0].imgUrl.path}`, ...previousImages] : previousImages,
+      type: "website",
+      url: canonicalUrl,
+      title,
+      description,
+      images: heroImage ? [heroImage, ...previousImages] : previousImages,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: heroImage ? [heroImage] : undefined,
     },
   };
 }
 
-import { getTranslations } from 'next-intl/server';
-import BreadcrumbSchema from '@/components/breadcrumb-schema';
-
-export default async function GilamById({ params, searchParams }: { params: Promise<{ id: string, locale: string }>, searchParams: Promise<any> }) {
+export default async function GilamById({
+  params,
+  searchParams,
+}: {
+  params: Promise<LocaleParams>;
+  searchParams: Promise<GlamSearchParams>;
+}) {
   const { id, locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'Layout' });
   const sp = await searchParams;
-  const oneProduct = await getSingleProduct(id);
-  const product = await getProduct({ search: sp?.modelId + " " + sp?.color + " " + sp?.collectionId, productId: id });
 
+  const [product, t] = await Promise.all([
+    getSingleProduct(id),
+    getTranslations({ locale, namespace: "Layout" }),
+  ]);
+
+  if (!product) {
+    notFound();
+  }
+
+  const searchTerms = [sp?.modelId, sp?.color, sp?.collectionId]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+  const related = await getRelatedProducts({
+    search: searchTerms,
+    productId: id,
+  });
+
+  const heroImageUrl = product.imgUrl?.path
+    ? `${minio_img_url}${product.imgUrl.path}`
+    : undefined;
+  const canonicalUrl = `${SITE_URL}/${locale}/glam/${id}`;
+
+  // Schema.org Product — SEO uchun rich snippet.
   const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: oneProduct?.[0]?.model?.title,
-    image: oneProduct?.[0]?.imgUrl?.path ? [`${minio_img_url}${oneProduct?.[0].imgUrl.path}`] : [],
-    description: oneProduct?.[0]?.internetInfo,
-    brand: {
-      '@type': 'Brand',
-      name: oneProduct?.[0]?.collection?.title
-    },
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: [product.model?.title, product.collection?.title]
+      .filter(Boolean)
+      .join(" ")
+      .trim(),
+    sku: product.code,
+    image: heroImageUrl ? [heroImageUrl] : [],
+    description: product.internetInfo ?? undefined,
+    brand: product.collection?.title
+      ? { "@type": "Brand", name: product.collection.title }
+      : undefined,
     offers: {
-      '@type': 'Offer',
-      price: oneProduct?.[0]?.i_price,
-      priceCurrency: 'UZS',
-      availability: 'https://schema.org/InStock',
-    }
+      "@type": "Offer",
+      url: canonicalUrl,
+      price: Number(product.i_price ?? 0),
+      priceCurrency: "UZS",
+      availability: (product.sizes?.length ?? 0) > 0
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+    },
   };
 
   const breadcrumbItems = [
     {
-      name: t('menu') || 'Home', // Fallback to 'Home' if translation fails, though 'menu' might not be the best key. 'Home' is usually separate. Let's check keys.
-      url: `${SITE_URL}/${locale}`
+      name: t("menu") || "Bosh sahifa",
+      url: `${SITE_URL}/${locale}`,
     },
     {
-      name: oneProduct?.[0]?.collection?.title || 'Collection',
-      url: `${SITE_URL}/${locale}/?collection=${oneProduct?.[0]?.collection?.id}`
+      name: product.collection?.title || "Kolleksiya",
+      url: `${SITE_URL}/${locale}/?collection=${product.collection?.id ?? ""}`,
     },
     {
-      name: oneProduct?.[0]?.model?.title,
-      url: `${SITE_URL}/${locale}/glam/${id}`
-    }
+      name: product.model?.title || "Mahsulot",
+      url: canonicalUrl,
+    },
   ];
 
   return (
@@ -85,11 +188,7 @@ export default async function GilamById({ params, searchParams }: { params: Prom
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <BreadcrumbSchema items={breadcrumbItems} />
-      <GlamById
-        id={id}
-        product={oneProduct}
-        productArr={product?.items}
-      />
+      <GlamById id={id} locale={locale} product={product} relatedProducts={related} />
     </>
   );
 }

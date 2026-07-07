@@ -60,7 +60,12 @@
         "like": "Yoqdi",
         "share": "Ulashish",
         "noImage": "Rasm yo'q",
-        "paymentDeliveryInfo": "Qo'shimcha ma'lumot olish uchun bog'laning."
+        "paymentDeliveryInfo": "Qo'shimcha ma'lumot olish uchun bog'laning.",
+        "linkCopied": "Havola nusxa olindi!",
+        "availableSizes": "Mavjud o'lchamlar",
+        "inStock": "{count} ta mavjud",
+        "outOfStock": "Sotuvda yo'q",
+        "priceLabel": "Narxi"
     },
     "NotFound": {
         "title": "Sahifa topilmadi",
