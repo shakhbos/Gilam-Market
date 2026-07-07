@@ -33,9 +33,21 @@ export default function GlamCardBusket({
 }: Props) {
   const t = useTranslations("Basket");
   const isMetric = !!items?.isMetric;
+  // Non-metric cap derivation: aynan shu size'ning qoldig'i (stock_this_size,
+  // backend /i-market/:id javobi) — eng aniqi. Yo'q bo'lsa total_count,
+  // aks holda sizes[] yig'indisi. Barchasi 0 bo'lsa fallback 1 —
+  // eski cache'lardan cart'da qolgan mahsulot kamida "1 ta" holatida bo'lsin.
+  const sizesSum = Array.isArray(items?.sizes)
+    ? items.sizes.reduce((acc: number, s: any) => acc + Number(s?.count || 0), 0)
+    : 0;
+  const derivedStock =
+    Number(items?.stock_this_size) ||
+    Number(items?.total_count) ||
+    sizesSum ||
+    0;
   const stockMax = isMetric
     ? Math.max(Math.round((items?.size?.y || 0) * 100), 1)
-    : Math.max(Number(items?.total_count ?? 0), 0);
+    : Math.max(derivedStock, 0);
   const initial = isMetric
     ? Math.round((items?.size?.y || 0) * 100)
     : Math.max(1, Number(items?.count) || 1);
