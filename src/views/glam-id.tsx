@@ -159,20 +159,29 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
     };
   };
 
-  const isSizeInCart = (s: GroupSize) => {
-    const id = s.qrBaseId || product.id;
-    return buskets.some((b) => b.id === id);
-  };
+  // O'lcham tanlash bosqichi: chip bosilganda faqat SELECT bo'ladi (visual),
+  // savatga qo'shish tugmasi bosilgach zakaz cartga tushadi. Bir chipni qayta
+  // bosish tanlashni bekor qiladi. Faqat 1 ta o'lcham mavjud bo'lsa avtomatik
+  // tanlanadi (useEffect quyida).
+  const [selectedSizeId, setSelectedSizeId] = useState<string | null>(null);
 
-  const toggleSize = (s: GroupSize) => {
-    if (!s.qrBaseId) return; // ma'lumotsiz eski javob bilan yumshoq no-op
-    const item = chipToCartItem(s);
-    const inCart = isSizeInCart(s);
-    dispatch(
-      inCart
-        ? changeBuskets(buskets.filter((b) => b.id !== item.id))
-        : changeBuskets([item, ...buskets]),
-    );
+  useEffect(() => {
+    const active = sizes.filter((s) => Number(s.count) > 0 && !!s.qrBaseId);
+    if (active.length === 1) {
+      setSelectedSizeId(active[0].id);
+    } else {
+      setSelectedSizeId(null);
+    }
+    // sizes referensiyasi har render'da o'zgarishi mumkin — id'lar bo'yicha
+    // qayta hisoblaymiz. product.id o'zgarganda ham reset qilamiz.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id, sizes.map((s) => `${s.id}:${s.count}`).join(",")]);
+
+  const selectedSize = sizes.find((s) => s.id === selectedSizeId) ?? null;
+
+  const selectSize = (s: GroupSize) => {
+    if (!s.qrBaseId) return;
+    setSelectedSizeId((cur) => (cur === s.id ? null : s.id));
   };
 
   // --- Pinterest-style pastdagi cheksiz scroll --- //
@@ -225,11 +234,25 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
     return () => observer.disconnect();
   }, [loadMore]);
 
-  const toggleCart = () => {
-    // Legacy product.i_price stale bo'lishi mumkin (backend qo'lda yozgan
-    // eski qiymatlar). Cart uchun UZS-per-m² qayta hisoblanadi va size.kv
-    // majburiy o'rnatiladi — busket kartochkasi va order servisi mos
-    // formula ishlatadi.
+  const addToCart = () => {
+    // Ikki holat:
+    //   1) Sizes ro'yxati bor — foydalanuvchi chip tanlab tugmani bosgan.
+    //      Tanlangan chip'ni cartga qo'shamiz va selectionni tozalaymiz
+    //      (chip va tugma yana kulrang holatga qaytadi).
+    //   2) Sizes yo'q (legacy fallback) — butun productni toggle qilamiz.
+    if (sizes.length > 0) {
+      if (!selectedSize) return; // tugma disabled bo'lishi kerak edi
+      const item = chipToCartItem(selectedSize);
+      // Duplikat oldini olish: agar shu qrBaseId cartda bor bo'lsa, faqat
+      // selectionni tozalaymiz (miqdorni oshirish cart sahifasidan bo'ladi).
+      if (!buskets.some((b) => b.id === item.id)) {
+        dispatch(changeBuskets([item, ...buskets]));
+      }
+      setSelectedSizeId(null);
+      return;
+    }
+    // Legacy: product.i_price stale bo'lishi mumkin — cart uchun UZS-per-m²
+    // qayta hisoblanadi va size.kv majburiy o'rnatiladi.
     const pricePerM2Uzs = marketPriceUsd * usdRate;
     const cartProduct = {
       ...product,
@@ -383,25 +406,25 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
               <div className="flex flex-wrap gap-2">
                 {sizes.map((s) => {
                   const label = `${Math.round(Number(s.x || 0) * 100)}x${Math.round(Number(s.y || 0) * 100)}`;
-                  const inCart = isSizeInCart(s);
-                  const disabled = !s.qrBaseId;
+                  const isSelected = selectedSizeId === s.id;
+                  const disabled = !s.qrBaseId || Number(s.count) <= 0;
                   return (
                     <button
                       key={s.id}
                       type="button"
-                      onClick={() => toggleSize(s)}
+                      onClick={() => selectSize(s)}
                       disabled={disabled}
-                      aria-pressed={inCart}
+                      aria-pressed={isSelected}
                       title={t("inStock", { count: s.count })}
                       className={`px-3 py-2 rounded-[5px] text-[14px] lg:text-[16px] inline-flex items-center gap-2 transition-colors border ${
-                        inCart
+                        isSelected
                           ? "bg-[#121212] text-white border-[#121212]"
                           : "bg-[#F4F4F4] text-[#212121] border-transparent hover:border-[#121212]"
                       } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                     >
                       <span>{label}</span>
                       <span
-                        className={`text-[12px] ${inCart ? "text-white/70" : "text-[#6B6B6B]"}`}
+                        className={`text-[12px] ${isSelected ? "text-white/70" : "text-[#6B6B6B]"}`}
                       >
                         ({s.count})
                       </span>
@@ -470,20 +493,39 @@ export default function GlamById({ product, relatedProducts, usdRate }: Props) {
           {/* Uchta harakat tugmasi bitta chiziqda — chapdan o'ngga
               to'liq kenglikni to'ldiradi. Cart flex-1 (asosiy, kengroq),
               Yoqdi va Ulashish tabiiy o'lchamda. */}
+          {/*
+              Cart tugmasi ACTIVE bo'ladi qachonki: (a) sizes ro'yxati bor va
+              foydalanuvchi chip tanlagan, YOKI (b) sizes yo'q (legacy) va
+              product hozircha cartda emas. Aks holda tugma o'chiq (kul rang)
+              va bosilmaydi. Tanlash o'chgan hamono tugma yana kul rangga
+              qaytadi — foydalanuvchi qayta tanlashi kerak.
+          */}
           <div className="mt-[30px] lg:mt-[50px] mb-[36px] flex items-stretch gap-2 sm:gap-3 w-full">
-            <button
-              type="button"
-              onClick={toggleCart}
-              className="flex-1 bg-[#121212] text-white text-[13px] md:text-[14px] font-medium py-2 sm:py-[10px] rounded-lg px-4 sm:px-5 flex items-center justify-center gap-2 hover:bg-gray-800 transition-colors"
-            >
-              {isInCart ? (
-                t("added")
-              ) : (
-                <>
-                  <BackPlusIcons /> {t("addToCart")}
-                </>
-              )}
-            </button>
+            {(() => {
+              const hasSizes = sizes.length > 0;
+              const cartActive = hasSizes ? !!selectedSize : !isInCart;
+              const cartDisabled = hasSizes && !selectedSize;
+              return (
+                <button
+                  type="button"
+                  onClick={addToCart}
+                  disabled={cartDisabled}
+                  className={`flex-1 text-[13px] md:text-[14px] font-medium py-2 sm:py-[10px] rounded-lg px-4 sm:px-5 flex items-center justify-center gap-2 transition-colors ${
+                    cartActive
+                      ? "bg-[#121212] text-white hover:bg-gray-800 cursor-pointer"
+                      : "bg-[#F4F4F4] text-[#9A9A9A] cursor-not-allowed"
+                  }`}
+                >
+                  {!hasSizes && isInCart ? (
+                    t("added")
+                  ) : (
+                    <>
+                      <BackPlusIcons /> {t("addToCart")}
+                    </>
+                  )}
+                </button>
+              );
+            })()}
 
             <button
               type="button"
