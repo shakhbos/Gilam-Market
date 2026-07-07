@@ -38,6 +38,18 @@ const breakpointColumnsObj = {
  * shu sababli chip informativ — tanlash uchun kelgusi backend'da
  * "sibling qrBase id" qo'shilishi kerak.
  */
+/**
+ * Detail sahifada ko'rsatiladigan bitta media element.
+ * Video bo'lsa `kind='video'` va thumb sifatida main image ishlatiladi
+ * (video thumbnail yaratmaymiz, backend keshda yo'q).
+ */
+type MediaItem = {
+  key: string;
+  kind: "image" | "video";
+  url: string;
+  thumb: string;
+};
+
 export default function GlamById({ product, relatedProducts }: Props) {
   const t = useTranslations("Product");
   const [tab, setTab] = useState<1 | 2>(1);
@@ -49,6 +61,44 @@ export default function GlamById({ product, relatedProducts }: Props) {
   const imageUrl = product.imgUrl?.path
     ? `${minio_img_url}${product.imgUrl.path}`
     : "";
+  const videoUrl = product.videoUrl?.path
+    ? `${minio_img_url}${product.videoUrl.path}`
+    : "";
+  const otherImages: MediaItem[] = (product.other_images ?? [])
+    .filter((m) => !!m?.path)
+    .map((m, i) => ({
+      key: `other-${m.id ?? i}`,
+      kind: "image" as const,
+      url: `${minio_img_url}${m.path}`,
+      thumb: `${minio_img_url}${m.path}`,
+    }));
+
+  const gallery: MediaItem[] = [
+    ...(imageUrl
+      ? [
+          {
+            key: "main",
+            kind: "image" as const,
+            url: imageUrl,
+            thumb: imageUrl,
+          },
+        ]
+      : []),
+    ...otherImages,
+    ...(videoUrl
+      ? [
+          {
+            key: "video",
+            kind: "video" as const,
+            url: videoUrl,
+            thumb: imageUrl || "/empty-folder.png",
+          },
+        ]
+      : []),
+  ];
+  const [activeIdx, setActiveIdx] = useState(0);
+  const active = gallery[activeIdx];
+
   const collectionTitle =
     product.collection?.internetTitle?.trim() ||
     product.collection?.title ||
@@ -91,29 +141,73 @@ export default function GlamById({ product, relatedProducts }: Props) {
         </div>
 
         <div className="flex flex-col-reverse lg:flex-row w-full gap-4 max-w-full lg:max-w-[620px]">
-          <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-visible w-full lg:w-[81px] pb-2 lg:pb-0 no-scrollbar">
-            {imageUrl && (
-              <Image
-                src={imageUrl}
-                width={81}
-                height={100}
-                className="flex shrink-0 items-center object-contain justify-center w-[81px] overflow-hidden rounded-md"
-                alt={modelTitle || "Product thumbnail"}
-              />
-            )}
-          </div>
+          {/* Thumbnail satri — asosiy rasm + qo'shimcha rasmlar + video (bo'lsa).
+              Video thumb'ida qoplama play iconi turadi. */}
+          {gallery.length > 1 && (
+            <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-visible w-full lg:w-[81px] pb-2 lg:pb-0 no-scrollbar">
+              {gallery.map((m, idx) => (
+                <button
+                  key={m.key}
+                  type="button"
+                  onClick={() => setActiveIdx(idx)}
+                  className={`relative shrink-0 w-[81px] h-[100px] overflow-hidden rounded-md border-2 transition ${
+                    idx === activeIdx
+                      ? "border-[#212121]"
+                      : "border-transparent hover:border-[#e5e5e5]"
+                  }`}
+                  aria-label={m.kind === "video" ? "Video" : `Image ${idx + 1}`}
+                >
+                  <Image
+                    src={m.thumb}
+                    width={81}
+                    height={100}
+                    className="object-cover w-full h-full"
+                    alt={modelTitle || "Product thumbnail"}
+                  />
+                  {m.kind === "video" && (
+                    <span
+                      aria-hidden
+                      className="absolute inset-0 flex items-center justify-center bg-black/25"
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        width={22}
+                        height={22}
+                        fill="white"
+                      >
+                        <path d="M8 5v14l11-7L8 5z" />
+                      </svg>
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
 
-          {imageUrl ? (
+          {/* Asosiy media panel */}
+          {active ? (
             <div className="relative w-full flex items-center justify-center aspect-[6/4] lg:aspect-[4/4] lg:max-h-[740px] rounded-lg overflow-hidden bg-[#fcfcfc]">
-              <Image
-                src={imageUrl}
-                width={800}
-                height={800}
-                className="object-contain w-full h-full"
-                alt={modelTitle || "Product main image"}
-                priority
-                sizes="(max-width: 768px) 100vw, 620px"
-              />
+              {active.kind === "video" ? (
+                <video
+                  key={active.url}
+                  src={active.url}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  poster={active.thumb}
+                  className="w-full h-full object-contain bg-black"
+                />
+              ) : (
+                <Image
+                  src={active.url}
+                  width={800}
+                  height={800}
+                  className="object-contain w-full h-full"
+                  alt={modelTitle || "Product main image"}
+                  priority={active.key === "main"}
+                  sizes="(max-width: 768px) 100vw, 620px"
+                />
+              )}
             </div>
           ) : (
             <div className="flex items-center aspect-[3/4] sm:aspect-[2/3] w-full max-w-full lg:max-w-[500px] bg-[#F0F0E5] justify-center rounded-lg">
@@ -269,6 +363,9 @@ export default function GlamById({ product, relatedProducts }: Props) {
             const relatedImg = e.imgUrl?.path
               ? `${minio_img_url}${e.imgUrl.path}`
               : "";
+            const relatedVideo = e.videoUrl?.path
+              ? `${minio_img_url}${e.videoUrl.path}`
+              : undefined;
             const relatedIsLiked = likes.some((l) => l.id === e.id);
             const relatedInCart = buskets.some((b) => b.id === e.id);
             return (
@@ -280,6 +377,7 @@ export default function GlamById({ product, relatedProducts }: Props) {
                 type={e.sizeType ?? undefined}
                 text={e.size?.title ?? ""}
                 image={relatedImg}
+                video={relatedVideo}
                 isLike={relatedIsLiked}
                 onLike={() =>
                   dispatch(

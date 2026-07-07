@@ -126,6 +126,7 @@ export default function HomePage({ product, search }: HomePageProps) {
             type={e?.sizeType}
             text={e?.size?.title}
             image={e?.imgUrl?.path ? minio_img_url + e?.imgUrl?.path : ""}
+            video={e?.videoUrl?.path ? minio_img_url + e.videoUrl.path : undefined}
             isLike={likes?.map((it: any) => it?.id)?.includes(e?.id)}
             onLike={() => {
               dispatch(

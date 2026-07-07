@@ -1,6 +1,6 @@
 "use client";
 
-import type { MouseEvent } from "react";
+import { useRef, useState, type MouseEvent } from "react";
 import Image from "next/image";
 import { useRouter } from "../i18n/routing";
 import { BusketIcons, LikeIcons } from "./icons";
@@ -19,6 +19,12 @@ interface GlamCardProps {
   title: string;
   text?: string;
   image?: string;
+  /**
+   * Ixtiyoriy qisqa video URL (MinIO/CDN'dan). Berilsa hover holatda main
+   * image o'rniga muted+loop autoplay bo'ladi. Bo'sh bo'lsa hover ta'sir
+   * qilmaydi, faqat rasm turadi.
+   */
+  video?: string;
   type?: string | null;
   isLike?: boolean;
   isloading?: unknown;
@@ -28,8 +34,10 @@ interface GlamCardProps {
 
 /**
  * Katalog kartochkasi — bosh sahifa Masonry gridida ishlatiladi.
- * Yuklanish paytida skelet ko'rsatiladi; hover holatida like/cart
- * tugmalari chiqadi.
+ * - Default: main image.
+ * - Hover (agar video bor bo'lsa): video autoplay (muted+loop, faqat
+ *   pointer ustidan turgan paytda).
+ * - Yuklanish paytida skelet ko'rsatiladi.
  */
 export default function GlamCard({
   className,
@@ -41,16 +49,45 @@ export default function GlamCard({
   title,
   text,
   image,
+  video,
   isloading,
 }: GlamCardProps) {
   const router = useRouter();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [videoActive, setVideoActive] = useState(false);
   const sizeKey = type ?? "";
   const percentage = typeObj[sizeKey] ?? 100;
+  const hasVideo = !!video;
+
+  const startVideo = () => {
+    if (!hasVideo) return;
+    setVideoActive(true);
+    const el = videoRef.current;
+    if (el) {
+      el.currentTime = 0;
+      el.play().catch(() => {
+        // Autoplay bloklangan (iOS) — sukut bilan yopamiz.
+      });
+    }
+  };
+
+  const stopVideo = () => {
+    if (!hasVideo) return;
+    setVideoActive(false);
+    const el = videoRef.current;
+    if (el) {
+      el.pause();
+    }
+  };
 
   return (
     <article className="mb-1 group break-inside-avoid w-full">
       <div className={`${className ?? ""} text-center`}>
-        <div className="w-full h-auto min-h-[100px] relative flex text-center items-center justify-center">
+        <div
+          className="w-full h-auto min-h-[100px] relative flex text-center items-center justify-center"
+          onMouseEnter={startVideo}
+          onMouseLeave={stopVideo}
+        >
           {isloading ? (
             <div className="p-4 max-w-sm w-full mx-auto">
               <div className="animate-pulse space-y-4">
@@ -58,17 +95,36 @@ export default function GlamCard({
               </div>
             </div>
           ) : image ? (
-            <Image
-              onClick={() => router.push(url)}
-              height={1000}
-              width={1000}
+            <div
+              className="relative m-auto cursor-pointer ease-in duration-200 hover:-translate-y-1"
               style={{ width: `${percentage}%` }}
-              className="object-contain m-auto bg-transparent cursor-pointer ease-in duration-200 hover:-translate-y-1"
-              src={image}
-              alt={title || "Product Image"}
-              title={title}
-              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            />
+              onClick={() => router.push(url)}
+            >
+              <Image
+                height={1000}
+                width={1000}
+                className={`object-contain w-full bg-transparent transition-opacity duration-200 ${
+                  hasVideo && videoActive ? "opacity-0" : "opacity-100"
+                }`}
+                src={image}
+                alt={title || "Product Image"}
+                title={title}
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              />
+              {hasVideo && (
+                <video
+                  ref={videoRef}
+                  src={video}
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-200 ${
+                    videoActive ? "opacity-100" : "opacity-0"
+                  }`}
+                />
+              )}
+            </div>
           ) : (
             <div
               style={{
@@ -83,14 +139,14 @@ export default function GlamCard({
           <div
             className={`absolute ${
               isLike ? "flex" : "hidden"
-            } group-hover:flex bottom-[25px] left-0 gap-1 w-full items-center justify-center`}
+            } group-hover:flex bottom-[25px] left-0 gap-1 w-full items-center justify-center pointer-events-none`}
           >
             <div
               onClick={(e) => {
                 e.stopPropagation();
                 onLike?.(e);
               }}
-              className="p-[10px] bg-white cursor-pointer"
+              className="p-[10px] bg-white cursor-pointer pointer-events-auto"
             >
               <LikeIcons
                 stroke={isLike ? "red" : "black"}
@@ -102,7 +158,7 @@ export default function GlamCard({
                 e.stopPropagation();
                 onBuslet?.(e);
               }}
-              className="p-[10px] bg-white cursor-pointer"
+              className="p-[10px] bg-white cursor-pointer pointer-events-auto"
             >
               <BusketIcons />
             </div>
