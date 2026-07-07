@@ -28,14 +28,16 @@ export default function MyOrdersPage() {
   useEffect(() => {
     if (!token) return;
 
+    // Backend @Get('/for-client')da @CurrentUser('id') orqali JWT payloaddan
+    // userId oladi. Shu sabab token URL query'da emas, Authorization: Bearer
+    // header sifatida yuborilishi shart. Aks holda JwtAccessGuard 401 yoki
+    // handler undefined userId bilan bo'sh natija qaytaradi.
     const getMyOrders = async () => {
       try {
-        const response = await fetchData(
+        const response = await fetchData<any>(
           `${process.env.NEXT_PUBLIC_URL}/client-orders/for-client`,
-          {
-            token,
-            limit: 20,
-          }
+          { limit: 20 },
+          { headers: { Authorization: `Bearer ${token}` } },
         );
         setMyOrder(response);
       } catch (error) {
