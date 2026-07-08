@@ -68,19 +68,26 @@ export default function HomePage({ product, search }: HomePageProps) {
         `${process.env.NEXT_PUBLIC_URL}/qr-base/i-market`,
         {
           page,
-          limit: 10,
+          limit: 20,
           status: "published",
           search: search || undefined,
         },
       );
 
+      // hasMore ni meta bo'yicha aniqlaymiz — items.length'ga tayanish
+      // xato edi: backend post-filter tufayli sahifada limit'dan kam
+      // qaytishi mumkin, lekin totalPages'da yana sahifalar bor.
       if (res?.items?.length) {
-        setProducts((prev) => [...prev, ...res.items]);
-        setPage((prev) => prev + 1);
-        if (res.items.length < 10) {
-          setHasMore(false);
-        }
-      } else {
+        setProducts((prev) => {
+          const seen = new Set(prev.map((p) => p.id));
+          const fresh = res.items.filter((i) => !seen.has(i.id));
+          return [...prev, ...fresh];
+        });
+      }
+      setPage((prev) => prev + 1);
+      const currentPage = res?.meta?.currentPage ?? page;
+      const totalPages = res?.meta?.totalPages ?? 0;
+      if (currentPage >= totalPages) {
         setHasMore(false);
       }
     } catch (error) {

@@ -40,7 +40,7 @@ export default async function Home({
     `${process.env.NEXT_PUBLIC_URL}/qr-base/i-market`,
     {
       page: 1,
-      limit: 10,
+      limit: 20,
       status: "published",
       search: search || undefined,
     },
