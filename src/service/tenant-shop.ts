@@ -58,11 +58,12 @@ export const getTenantShop = cache(async (): Promise<TenantShop | null> => {
 
     const res = await fetch(`${API_BASE}/shop/public`, {
       method: "GET",
-      // Backend TenantMiddleware Host header'idan shopni topadi.
-      // Server-side fetch default'da Host'ni yubormaydi, shuning uchun
-      // aniq forward qilamiz.
+      // SSR fetch api.gilam-market.uz'ga boradi, shu sabab Host header'ida
+      // API domeni bo'ladi. Tenant domenni alohida `X-Shop-Host` header'i
+      // orqali uzatamiz — backend TenantMiddleware avval shu header'ni
+      // o'qib, keyin Host'ga fallback qiladi.
       headers: {
-        Host: hostname,
+        "X-Shop-Host": hostname,
         Accept: "application/json",
       },
       // Shop info kam o'zgaradi — 60s ISR mos keladi.
