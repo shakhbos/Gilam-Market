@@ -50,7 +50,12 @@ export const getTenantShop = cache(async (): Promise<TenantShop | null> => {
     const h = await headers();
     const rawHost =
       h.get("x-forwarded-host") || h.get("host") || "";
-    const hostname = rawHost.split(":")[0].toLowerCase().trim();
+    // Port va www. prefiksini olib tashlaymiz. Shop.domain DB'da apex sifatida
+    // saqlanadi ("elexus.uz"), request esa "www.elexus.uz" bilan keladi.
+    let hostname = rawHost.split(":")[0].toLowerCase().trim();
+    if (hostname.startsWith("www.")) {
+      hostname = hostname.slice(4);
+    }
 
     if (!hostname || SKIP_HOSTS.has(hostname)) {
       return null;
