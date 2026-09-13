@@ -2,7 +2,9 @@ import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { fetchData } from "@/service/get";
+import { getTenantShop } from "@/service/tenant-shop";
 import HomePage from "@/views/home";
+import HomeElexus from "@/views/home-elexus";
 import { SITE_URL } from "@/utils/seo";
 import { localizedAlternates } from "@/utils/metadata";
 import type { PageProps } from "@/types/next";
@@ -36,6 +38,20 @@ export default async function Home({
 }) {
   const { search } = await searchParams;
 
+  // Tenant asosida qaysi home ko'rsatishni tanlash.
+  //   - shop.slug === 'elexus' → yangi Elexus Hali dizayni (Figma 256:1490)
+  //   - boshqa hollar (default gilam-market.uz yoki tenant topilmadi) → hozirgi
+  //     Gilam Market home. Kelajakda boshqa tenantlar qo'shilsa shu joyda
+  //     switch qilamiz.
+  const shop = await getTenantShop();
+  const isElexus = shop?.slug === "elexus";
+
+  if (isElexus && shop) {
+    // Elexus branch — hozircha statik demo. Backend'ga bog'lash keyingi bosqichda.
+    return <HomeElexus shop={shop} />;
+  }
+
+  // Default Gilam Market branch
   const products = await fetchData<PaginatedResponse<QrBaseProduct>>(
     `${process.env.NEXT_PUBLIC_URL}/qr-base/i-market`,
     {

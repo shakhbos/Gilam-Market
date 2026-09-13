@@ -13,41 +13,66 @@ import { Inter } from 'next/font/google';
 import { Suspense } from "react";
 import Metrika from "@/components/Metrika";
 import type { LayoutProps, MetadataProps } from '@/types/next';
+import { getTenantShop } from "../../service/tenant-shop";
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 
+// Fallback ranglar — tenant shop primary/secondary ranglar yo'q bo'lsa
+const DEFAULT_PRIMARY = "#2299DD";
+const DEFAULT_SECONDARY = "#F97316";
+
 export async function generateMetadata({ params }: MetadataProps): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'Metadata' });
+  const [t, shop] = await Promise.all([
+    getTranslations({ locale, namespace: 'Metadata' }),
+    getTenantShop(),
+  ]);
+
+  // Tenant nomlari (Elexus, va h.k.) SEO'da ustuvor bo'lsin.
+  // Tenant yo'q bo'lsa (default gilam-market.uz) — hozirgi Gilam Market brand.
+  const brandTitle = shop?.title || t('title') || 'Gilam Market';
+  const brandDescription =
+    shop?.description || t('description') || 'Gilam Market — sifatli gilamlar va qulay narxlar';
+  const brandOgTitle =
+    shop?.title || t('ogTitle') || "Gilam Market - Premium gilamlar va poyandozlar onlayn";
+  const brandOgDescription =
+    shop?.description || t('ogDescription') || 'Gilam Market — sifatli gilamlar va qulay narxlar';
+
+  // Site URL — tenant domeni bo'lsa o'sha, aks holda default
+  const siteUrl = shop?.domain ? `https://${shop.domain}` : SITE_URL;
+  const ogImage = shop?.logoUrl || `${siteUrl}/logo.svg`;
 
   return {
-    metadataBase: new URL(SITE_URL),
+    metadataBase: new URL(siteUrl),
     title: {
-      default: t('title') || 'Gilam Market',
-      template: '%s | Gilam Market'
+      default: brandTitle,
+      template: `%s | ${brandTitle}`,
     },
-    description: t('description') || 'Gilam Market — sifatli gilamlar va qulay narxlar',
+    description: brandDescription,
+    icons: shop?.faviconUrl
+      ? { icon: shop.faviconUrl }
+      : undefined,
     openGraph: {
       type: 'website',
       locale: locale === 'en' ? 'en_US' : locale === 'ru' ? 'ru_RU' : 'uz_UZ',
-      url: SITE_URL,
-      siteName: 'Gilam Market',
-      title: t('ogTitle') || "Gilam Market - Premium gilamlar va poyandozlar onlayn",
-      description: t('ogDescription') || 'Gilam Market — sifatli gilamlar va qulay narxlar',
+      url: siteUrl,
+      siteName: brandTitle,
+      title: brandOgTitle,
+      description: brandOgDescription,
       images: [
         {
-          url: `${SITE_URL}/logo.svg`,
+          url: ogImage,
           width: 1200,
           height: 630,
-          alt: 'Gilam Market Logo',
+          alt: `${brandTitle} Logo`,
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: t('title') || 'Gilam Market',
-      description: t('description') || 'Gilam Market — sifatli gilamlar va qulay narxlar',
-      images: [`${SITE_URL}/logo.svg`],
+      title: brandTitle,
+      description: brandDescription,
+      images: [ogImage],
     },
     alternates: {
       canonical: '/',
@@ -62,7 +87,7 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
       'turkish carpets', 'iranian rugs', 'online shop', 'buy carpet', 'gilam narxlari',
       'arzon gilamlar', 'quality rugs', 'interior design'
     ],
-    authors: [{ name: 'Gilam Market Team' }],
+    authors: [{ name: `${brandTitle} Team` }],
     robots: {
       index: true,
       follow: true,
@@ -83,13 +108,28 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
     notFound();
   }
 
-  const messages = await getMessages();
+  const [messages, shop] = await Promise.all([
+    getMessages(),
+    getTenantShop(),
+  ]);
+
+  // Tenant brand ranglari — CSS variables orqali Tailwind/inline stillarda
+  // ishlatilishi mumkin. Tenant yo'q bo'lsa default rang'i.
+  const primary = shop?.primaryColor || DEFAULT_PRIMARY;
+  const secondary = shop?.secondaryColor || DEFAULT_SECONDARY;
 
   return (
-    <html lang={locale}>
+    <html
+      lang={locale}
+      style={{
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ["--tenant-primary" as any]: primary,
+        ["--tenant-secondary" as any]: secondary,
+      }}
+    >
       <body className={inter.className}>
         <NextTopLoader
-          color="#2299DD"
+          color={primary}
           initialPosition={0.08}
           crawlSpeed={200}
           height={3}
@@ -97,7 +137,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
           showSpinner={true}
           easing="ease"
           speed={200}
-          shadow="0 0 10px #2299DD,0 0 5px #2299DD"
+          shadow={`0 0 10px ${primary},0 0 5px ${primary}`}
         />
         <NextIntlClientProvider messages={messages}>
           <StoreProvider>
