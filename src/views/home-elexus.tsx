@@ -1,3 +1,4 @@
+import ElexusHeader from "@/components/elexus/header";
 import type { TenantShop } from "@/service/tenant-shop";
 
 /**
@@ -21,14 +22,8 @@ export default function HomeElexus({ shop }: Props) {
   return (
     <div className="bg-white text-[#171717] antialiased" data-tenant={shop.slug}>
       {/* 1. Header — top navbar */}
-      <section data-section="header" className="border-b border-[#F4F4F4]">
-        <div className="mx-auto flex h-[90px] max-w-[1920px] items-center px-[60px] text-[15px]">
-          <span className="font-extrabold tracking-[2.4px] text-[24px] uppercase">
-            {brand}
-          </span>
-          <span className="ml-auto text-[#B0B0B0]">HEADER (keyingi commit)</span>
-        </div>
-      </section>
+      <ElexusHeader shop={shop} />
+
 
       {/* 2. Hero — big headline + circular image + pill */}
       <section data-section="hero" className="px-[60px] py-16 text-center text-[#B0B0B0]">

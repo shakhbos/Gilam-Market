@@ -145,7 +145,11 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
               {children}
             </main>
             <ToastContainer />
-            <FixedLayout />
+            {/* FixedLayout — Gilam Market'ning umumiy header/drawer/menu.
+                Tenant shop bo'lsa (masalan Elexus), tenant o'zining header +
+                footer'ini home-elexus.tsx ichida chizadi, shu sabab bu yerda
+                ko'rsatilmaydi. Default (shop yo'q) hollar uchun ko'rsatiladi. */}
+            {!shop && <FixedLayout />}
           </StoreProvider>
         </NextIntlClientProvider>
         <Suspense>

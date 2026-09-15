@@ -47,6 +47,26 @@ const SKIP_HOSTS = new Set([
 
 export const getTenantShop = cache(async (): Promise<TenantShop | null> => {
   try {
+    // Local dev fallback: agar DEV_TENANT_SLUG env variable o'rnatilgan bo'lsa,
+    // undan slug bo'yicha shop olamiz (Host = localhost SKIP_HOSTS'da). Bu ish
+    // faqat process.env.NODE_ENV !== 'production' da faol.
+    // .env.local'da: DEV_TENANT_SLUG=elexus
+    if (
+      process.env.NODE_ENV !== "production" &&
+      process.env.DEV_TENANT_SLUG
+    ) {
+      const devSlug = process.env.DEV_TENANT_SLUG.trim().toLowerCase();
+      const res = await fetch(`${API_BASE}/shop/public?shop=${devSlug}`, {
+        method: "GET",
+        headers: { Accept: "application/json" },
+        cache: "no-store",
+      });
+      if (res.ok) return (await res.json()) as TenantShop;
+      console.warn(
+        `[getTenantShop] DEV shop lookup failed for slug=${devSlug} (${res.status})`,
+      );
+    }
+
     const h = await headers();
     const rawHost =
       h.get("x-forwarded-host") || h.get("host") || "";
