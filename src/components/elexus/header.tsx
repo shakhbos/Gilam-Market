@@ -98,28 +98,29 @@ export default function ElexusHeader({ shop: _shop }: Props) {
             <span className="hidden md:inline">AR-Solishtirish</span>
           </Link>
 
-          {/* Icons card (216w) — left border divider (Figma Group 72) */}
-          <div className="flex items-center justify-center gap-[24px] sm:gap-[32px] lg:gap-[40px] h-full px-[24px] lg:w-[216px] lg:px-0 border-l border-[#F4F4F4]">
+          {/* Icons card — desktop 216w (Figma Group 72), kichik ekranlarda
+              icon o'lchamlari + gap qisqaradi (header siqilmasin) */}
+          <div className="flex items-center justify-center gap-[12px] sm:gap-[20px] md:gap-[28px] lg:gap-[40px] h-full px-[12px] sm:px-[16px] md:px-[20px] lg:w-[216px] lg:px-0 border-l border-[#F4F4F4]">
             <Link
               href="/profile"
               aria-label="Profile"
               className="inline-flex text-black hover:opacity-70 transition-opacity"
             >
-              <User className="size-[24px]" strokeWidth={1.75} />
+              <User className="size-[18px] sm:size-[20px] lg:size-[24px]" strokeWidth={1.75} />
             </Link>
             <Link
               href="/favorites"
               aria-label="Favorites"
               className="inline-flex text-black hover:opacity-70 transition-opacity"
             >
-              <Heart className="size-[24px]" strokeWidth={1.75} />
+              <Heart className="size-[18px] sm:size-[20px] lg:size-[24px]" strokeWidth={1.75} />
             </Link>
             <Link
               href="/cart"
               aria-label="Cart"
               className="inline-flex text-black hover:opacity-70 transition-opacity"
             >
-              <ShoppingCart className="size-[24px]" strokeWidth={1.75} />
+              <ShoppingCart className="size-[18px] sm:size-[20px] lg:size-[24px]" strokeWidth={1.75} />
             </Link>
           </div>
         </div>
