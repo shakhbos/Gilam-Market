@@ -48,8 +48,10 @@ type Props = {
  *   - ≥768 (md): "Gilam Katalog" → "Katalog", "AR-Solishtirish" qoladi
  *   - <768 (sm/mobile): "Katalog" qoladi, "AR-Solishtirish" → "AR" (56-80px)
  */
-export default function ElexusHeader({ shop }: Props) {
-  const brand = shop.title || "Elexus GIlam";
+export default function ElexusHeader({ shop: _shop }: Props) {
+  // Brand headerda faqat "Elexus" ko'rsatiladi (shop.title metadata uchun
+  // to'liq "Elexus Gilam" bo'lib qoladi — browser tab, SEO)
+  const brand = "Elexus";
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-[#F4F4F4]">
