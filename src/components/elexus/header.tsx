@@ -43,10 +43,10 @@ type Props = {
  *   - Menu / AR: 15px bold, letter-spacing -0.165px (SF Pro Display Bold)
  *   - Icons: 24×24
  *
- * Responsive:
- *   - ≥1280 (xl): to'liq Figma layout (logo card + burger+menu + AR + icons)
- *   - ≥768 (md): AR-Solishtirish qoladi, logo card border-r yashiriladi
- *   - <768: AR-Solishtirish yashirinadi, faqat brand + burger + "Gilam Katalog" + icons
+ * Responsive (hech qanday item YO'QOLMAYDI, faqat textlar qisqaradi):
+ *   - ≥1280 (xl / lg): to'liq Figma layout ("Gilam Katalog" · "AR-Solishtirish")
+ *   - ≥768 (md): "Gilam Katalog" → "Katalog", "AR-Solishtirish" qoladi
+ *   - <768 (sm/mobile): "Katalog" qoladi, "AR-Solishtirish" → "AR" (56-80px)
  */
 export default function ElexusHeader({ shop }: Props) {
   const brand = shop.title || "Elexus GIlam";
@@ -66,7 +66,7 @@ export default function ElexusHeader({ shop }: Props) {
         </div>
 
         {/* Burger + Gilam Katalog — logodan keyingi seksiya (Figma Frame 31) */}
-        <div className="flex items-center gap-[20px] pl-[16px] sm:pl-[20px] h-full">
+        <div className="flex items-center gap-[16px] sm:gap-[20px] pl-[12px] sm:pl-[20px] h-full">
           <button
             type="button"
             aria-label="Menu"
@@ -74,22 +74,26 @@ export default function ElexusHeader({ shop }: Props) {
           >
             <BurgerIcon />
           </button>
+          {/* Text ekran torayganda "Katalog" ga qisqaradi (Figma to'liq: "Gilam Katalog") */}
           <Link
             href="/catalog"
-            className="whitespace-nowrap font-bold text-black text-[15px] leading-none tracking-[-0.165px] hover:opacity-70 transition-opacity"
+            className="whitespace-nowrap font-bold text-black text-[13px] sm:text-[15px] leading-none tracking-[-0.165px] hover:opacity-70 transition-opacity"
           >
-            Gilam Katalog
+            <span className="lg:hidden">Katalog</span>
+            <span className="hidden lg:inline">Gilam Katalog</span>
           </Link>
         </div>
 
         {/* ── O'ng tomon: AR + Icons ── */}
         <div className="ml-auto flex items-stretch h-full">
-          {/* AR-Solishtirish card (165w) — left border divider (Figma Group 57) */}
+          {/* AR-Solishtirish card — desktop'da 165w, kichrayganda width qisqaradi
+              va text "AR" ga tushadi (yo'qotilmaydi) */}
           <Link
             href="/ar"
-            className="hidden md:inline-flex items-center justify-center h-full w-[130px] lg:w-[165px] border-l border-[#F4F4F4] font-bold text-black text-[13px] lg:text-[15px] leading-none tracking-[-0.165px] whitespace-nowrap hover:bg-[#FAFAFA] transition-colors"
+            className="inline-flex items-center justify-center h-full w-[56px] sm:w-[80px] md:w-[130px] lg:w-[165px] border-l border-[#F4F4F4] font-bold text-black text-[13px] lg:text-[15px] leading-none tracking-[-0.165px] whitespace-nowrap hover:bg-[#FAFAFA] transition-colors"
           >
-            AR-Solishtirish
+            <span className="md:hidden">AR</span>
+            <span className="hidden md:inline">AR-Solishtirish</span>
           </Link>
 
           {/* Icons card (216w) — left border divider (Figma Group 72) */}
