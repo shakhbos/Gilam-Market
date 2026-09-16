@@ -33,14 +33,17 @@ export default function HeroElexus({
   phone,
   address,
   videoSrc,
-  posterSrc = "https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=2400&q=80",
+  // Vaqtinchalik: /public/elexus/hero.jpg dan rasm oladi. Fayl bo'lmasa
+  // Unsplash placeholder ishlatiladi (browser fallback CSS ostida).
+  posterSrc = "/elexus/hero.jpg",
 }: Props) {
   return (
     <section
       data-section="hero"
       className="relative w-full overflow-hidden bg-black"
-      // Figma: 1037/1728 ≈ 60% viewport height on desktop; min 520 mobile
-      style={{ height: "min(60vw, 720px)", minHeight: "520px" }}
+      // Header (80px) dan pastda to'liq viewport egallaydi. Barcha ekranlarda
+      // baland aksept qiladi (mobile pastroq).
+      style={{ height: "calc(100vh - 80px)", minHeight: "520px" }}
     >
       {/* Fon: video yoki rasm */}
       {videoSrc ? (
@@ -59,6 +62,16 @@ export default function HeroElexus({
           alt="Elexus Gilam showroom"
           className="absolute inset-0 h-full w-full object-cover"
           draggable={false}
+          onError={(e) => {
+            // Fayl yo'q bo'lsa Unsplash placeholder'ga o'tish
+            const img = e.currentTarget;
+            if (
+              !img.src.includes("unsplash")
+            ) {
+              img.src =
+                "https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=2400&q=80";
+            }
+          }}
         />
       )}
 
