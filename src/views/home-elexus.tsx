@@ -1,14 +1,29 @@
 import ElexusHeader from "@/components/elexus/header";
+import HeroElexus from "@/components/elexus/hero";
+import UslublarSection from "@/components/elexus/uslublar";
+import AboutSection from "@/components/elexus/about";
+import PortfolioSection from "@/components/elexus/portfolio";
+import ProductsSection from "@/components/elexus/products";
+import PromotionsSection from "@/components/elexus/promotions";
+import TestimonialsSection from "@/components/elexus/testimonials";
+import CtaSection from "@/components/elexus/cta";
+import FooterElexus from "@/components/elexus/footer";
 import type { TenantShop } from "@/service/tenant-shop";
 
 /**
- * Elexus Hali home page — tenant maxsus dizayni (Figma: 256:1490).
+ * Elexus New Home page (Figma frame 333:711).
  *
- * Bosqichma-bosqich implement qilinadi. Hozir skeleton (12 seksiya placeholder)
- * — keyingi commit'larda Header → Hero → USLUBLAR → ... to'ldiriladi.
- *
- * Ma'lumot manbai: hozircha statik demo (Figma matni), keyin backend
- * `/shop-product`, `/shop-banner`, `/shop-promotion` API'lariga bog'lanadi.
+ * Sahifa strukturasi:
+ *   1. Header — sticky top navbar
+ *   2. Hero — video/rasm fon + address/phone chapda + description/button o'ngda
+ *   3. USLUBLAR — 5 karta karusel
+ *   4. Мы ради работать в вашем уюте — 3 kolonka (sarlavha + 2 paragraph)
+ *   5. Наше портфолио — 1608×600 panoramic rasm
+ *   6. ПРОДУКТЫ (HERA LUXURY) — sarlavha panel + 3 karta grid
+ *   7. Акции и скидки — sarlavha panel + 3 karta grid + Загрузить ещё
+ *   8. Что говорят о нас — sarlavha + 3 testimonial karta
+ *   9. CTA — "Подарите интерьеру особенный характер" band
+ *   10. Footer — 5 kolonka (brand+social + 4 link kolonkasi)
  */
 type Props = {
   shop: TenantShop;
@@ -20,59 +35,20 @@ export default function HomeElexus({ shop }: Props) {
   const address = shop.address || "Uzbekistan, Tashkent, Aloqa, street 28";
 
   return (
-    <div className="bg-white text-[#171717] antialiased" data-tenant={shop.slug}>
-      {/* 1. Header — top navbar */}
+    <div
+      className="bg-white text-[#171717] antialiased"
+      data-tenant={shop.slug}
+    >
       <ElexusHeader shop={shop} />
-
-
-      {/* 2. Hero — keyingi commit'da qaytadan yozamiz */}
-      <section data-section="hero" className="px-[60px] py-16 text-center text-[#B0B0B0]">
-        HERO (keyingi commit)
-      </section>
-
-      {/* 3. USLUBLAR karusel */}
-      <section data-section="uslublar" className="px-[60px] py-16 text-center text-[#B0B0B0]">
-        USLUBLAR (keyingi commit)
-      </section>
-
-      {/* 4. МЫ РАДЫ РАБОТАТЬ — 2 kolonka matn */}
-      <section data-section="about" className="px-[60px] py-16 text-center text-[#B0B0B0]">
-        МЫ РАДЫ РАБОТАТЬ (keyingi commit)
-      </section>
-
-      {/* 5. Portfolio panorama */}
-      <section data-section="portfolio" className="px-[60px] py-16 text-center text-[#B0B0B0]">
-        PORTFOLIO (keyingi commit)
-      </section>
-
-      {/* 6. ПРОДУКТЫ — 3 karta + Загрузить ещё */}
-      <section data-section="products" className="px-[60px] py-16 text-center text-[#B0B0B0]">
-        ПРОДУКТЫ (keyingi commit)
-      </section>
-
-      {/* 7. АКЦИИ И СКИДКИ — 3 karta + ribbon */}
-      <section data-section="promotions" className="px-[60px] py-16 text-center text-[#B0B0B0]">
-        АКЦИИ И СКИДКИ (keyingi commit)
-      </section>
-
-      {/* 8. ЧТО ГОВОРЯТ О НАС — 3 testimonial */}
-      <section data-section="testimonials" className="px-[60px] py-16 text-center text-[#B0B0B0]">
-        ЧТО ГОВОРЯТ О НАС (keyingi commit)
-      </section>
-
-      {/* 9. CTA + social icons */}
-      <section data-section="cta" className="px-[60px] py-16 text-center text-[#B0B0B0]">
-        CTA (keyingi commit)
-      </section>
-
-      {/* 10. Footer — 4 kolonka + kontakt */}
-      <footer data-section="footer" className="px-[60px] py-16 text-[#B0B0B0]">
-        <div className="mx-auto flex max-w-[1920px] flex-col gap-2">
-          <span className="text-[24px] font-bold text-[#171717]">{phone}</span>
-          <span className="text-[15px] font-semibold text-[#171717]">{address}</span>
-          <span className="text-[13px]">© 2026 · Дом ковровых изделий · {brand}</span>
-        </div>
-      </footer>
+      <HeroElexus phone={phone} address={address} />
+      <UslublarSection />
+      <AboutSection />
+      <PortfolioSection />
+      <ProductsSection />
+      <PromotionsSection />
+      <TestimonialsSection />
+      <CtaSection />
+      <FooterElexus phone={phone} address={address} brand={brand} />
     </div>
   );
 }
