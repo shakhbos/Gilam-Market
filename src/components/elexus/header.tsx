@@ -1,5 +1,5 @@
 import { User, Heart, ShoppingCart } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 
 import type { TenantShop } from "@/service/tenant-shop";
 

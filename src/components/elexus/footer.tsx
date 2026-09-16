@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 
 /**
  * Footer seksiyasi (Figma 333:736, 333:770-775, 333:854-863, 333:519-571).
