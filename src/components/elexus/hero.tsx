@@ -15,17 +15,16 @@ type Props = {
 /**
  * Elexus Home1 Hero — Figma'ga aynan mos o'lchamlar.
  *
- * FIGMA REFERENS (1728 kanvas, 780 hero balandligi):
- *   - Video card: 264 × 388 px, position x=683 y=263 (Rectangle 49)
- *     → ekran markazidan biroz chapda, aspect 2:3 portret.
- *   - Mutaxasis pill button: 220 × 60, x=972 y=303 → video o'ng qirrasi
- *     yonida (video tugaydigan x=947 dan ~25 px o'ngda), yuqori qatorda.
- *   - Aloqa bloki: x=60 y=104 → chap yuqori.
- *   - Katta scattered text YO'Q (Home1 varianti).
+ * FIGMA REFERENS (Home1 varianti):
+ *   - Video card: 150 × 90 px (aspect 5:3 landscape) — juda kichkina,
+ *     markazda joylashgan.
+ *   - Mutaxasis pill button: video o'ng qirrasi yonida.
+ *   - Aloqa bloki: chap yuqori.
+ *   - Katta scattered text YO'Q.
  *
- * O'lchamlar responsive:
- *   - width='clamp(220px, 15.3vw, 264px)' — Figma qiymatiga qarab.
- *   - height='clamp(320px, 38vh, 388px)'.
+ * Responsive scaling (kichik desktop → katta desktop):
+ *   - width: clamp(150px, 12vw, 220px)
+ *   - height: auto (aspect-ratio 5/3 saqlanadi)
  *
  * ANIMATSIYA:
  *   - Kirish: kontakt chapdan slide, video scale-up, button scale-up.
@@ -57,13 +56,12 @@ export default function HeroElexus({
   const initialOpacity = useTransform(progress, [0, 0.35], [1, 0]);
   const initialY = useTransform(progress, [0, 0.5], [0, -30]);
 
-  // Video maydoni — Figma o'lchami (264×388) → viewport'ga kengayadi
-  // Boshlanish: 264/1728 = 15.3% ekran keng
-  //             388/1080 = 36% ekran baland (aspect 2:3 saqlanadi)
-  // Oxiri: 100% × 100vh
-  const mediaWidth = useTransform(progress, [0, 1], ["15.3%", "100%"]);
-  const mediaHeight = useTransform(progress, [0, 1], ["55vh", "100vh"]);
-  const mediaRadius = useTransform(progress, [0, 1], [8, 0]);
+  // Video maydoni — Figma: 150×90 landscape (5:3), scroll'da viewport'ga kengayadi
+  // Boshlanish: 150px (~10.4vw at 1440) × 90px (aspect saqlanadi)
+  // Oxiri: 100vw × 100vh
+  const mediaWidth = useTransform(progress, [0, 1], ["min(220px, 12vw)", "100vw"]);
+  const mediaHeight = useTransform(progress, [0, 1], ["min(132px, 7.2vw)", "100vh"]);
+  const mediaRadius = useTransform(progress, [0, 1], [6, 0]);
   const gradientOpacity = useTransform(progress, [0.4, 0.9], [0, 1]);
 
   // Kengaygan overlay (scroll oxirida)
@@ -142,18 +140,15 @@ export default function HeroElexus({
           />
         </motion.div>
 
-        {/* ── "Mutaxasis yollash" pill (Figma: 220×60 at x=972 y=303) ──
-            Video card markaziy (x=815 nazariy), o'ng qirrasi ~x=947. Button
-            x=972 (25px keyin). Ekran markazidan +180px o'ng, video top qismi
-            yonida (55vh video, y=303 → video ustki 1/4 dagi). */}
+        {/* ── "Mutaxasis yollash" pill — video o'ng qirrasi yonida, vertically centered ──
+            Video max keng 220px, yarim = 110px. Button = center + 110px + 20px gap. */}
         <motion.div
           initial={{ opacity: 0, scale: 0.85, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.9, ease: OUT_EXPO, delay: 0.6 }}
-          className="pointer-events-auto absolute left-1/2 z-30"
+          className="pointer-events-auto absolute left-1/2 top-1/2 z-30 -translate-y-1/2"
           style={{
-            top: "calc(50% - 22vh)",       // video markazidan tepa-yuqori
-            marginLeft: "calc(7.65vw + 30px)", // video o'ng qirrasidan (video yarim keng 7.65vw) + 30px
+            marginLeft: "calc(min(6vw, 110px) + 20px)",
             opacity: initialOpacity,
           }}
         >
