@@ -1,5 +1,4 @@
 import ElexusHeader from "@/components/elexus/header";
-import HeroElexus from "@/components/elexus/hero";
 import type { TenantShop } from "@/service/tenant-shop";
 
 /**
@@ -26,8 +25,10 @@ export default function HomeElexus({ shop }: Props) {
       <ElexusHeader shop={shop} />
 
 
-      {/* 2. Hero — scroll-linked expand effekti (waabi.ai uslubi teskarisi) */}
-      <HeroElexus phone={phone} address={address} />
+      {/* 2. Hero — keyingi commit'da qaytadan yozamiz */}
+      <section data-section="hero" className="px-[60px] py-16 text-center text-[#B0B0B0]">
+        HERO (keyingi commit)
+      </section>
 
       {/* 3. USLUBLAR karusel */}
       <section data-section="uslublar" className="px-[60px] py-16 text-center text-[#B0B0B0]">
