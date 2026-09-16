@@ -68,8 +68,10 @@ export default function HeroElexus({
             if (
               !img.src.includes("unsplash")
             ) {
+              // Vaqtinchalik: gilam showroom uslubidagi rasm — kelajakda
+              // /elexus/hero.jpg fayli qo'yilgach shu URL avtomatik ishlaydi.
               img.src =
-                "https://images.unsplash.com/photo-1631679706909-1844bbd07221?auto=format&fit=crop&w=2400&q=80";
+                "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2400&q=80";
             }
           }}
         />
