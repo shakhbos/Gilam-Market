@@ -1,5 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { BusketReducer, LikeReducer, TokenReducer, UserMeReducer } from "./features";
+import {
+  BusketReducer,
+  LikeReducer,
+  TokenReducer,
+  UserMeReducer,
+  CartElexusReducer,
+} from "./features";
 
 export const makeStore = () => {
   return configureStore({
@@ -8,6 +14,7 @@ export const makeStore = () => {
       buskets: BusketReducer,
       token: TokenReducer,
       userMe: UserMeReducer,
+      cartElexus: CartElexusReducer,
     },
   });
 };

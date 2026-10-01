@@ -1,54 +1,69 @@
-import ElexusHeader from "@/components/elexus/header";
-import HeroElexus from "@/components/elexus/hero";
-import UslublarSection from "@/components/elexus/uslublar";
-import AboutSection from "@/components/elexus/about";
-import PortfolioSection from "@/components/elexus/portfolio";
-import ProductsSection from "@/components/elexus/products";
-import PromotionsSection from "@/components/elexus/promotions";
-import TestimonialsSection from "@/components/elexus/testimonials";
-import CtaSection from "@/components/elexus/cta";
-import FooterElexus from "@/components/elexus/footer";
+import Header from "@/components/elexus/header";
+import Hero from "@/components/elexus/hero";
+import StylesSection from "@/components/elexus/styles-section";
+import ProductsSection from "@/components/elexus/products-section";
+import DiscountsSection from "@/components/elexus/discounts-section";
+import AboutSection from "@/components/elexus/about-section";
+import PortfolioSection from "@/components/elexus/portfolio-section";
+import ReviewsSection from "@/components/elexus/reviews-section";
+import PromoBannerSection from "@/components/elexus/promo-banner-section";
+import Footer from "@/components/elexus/footer";
 import type { TenantShop } from "@/service/tenant-shop";
 
 /**
- * Elexus New Home page (Figma frame 333:711).
+ * Elexus home — barcha 9 seksiya + footer (Figma frame 100:281 to'liq).
  *
- * Sahifa strukturasi:
- *   1. Header — sticky top navbar
- *   2. Hero — video/rasm fon + address/phone chapda + description/button o'ngda
- *   3. USLUBLAR — 5 karta karusel
- *   4. Мы ради работать в вашем уюте — 3 kolonka (sarlavha + 2 paragraph)
- *   5. Наше портфолио — 1608×600 panoramic rasm
- *   6. ПРОДУКТЫ (HERA LUXURY) — sarlavha panel + 3 karta grid
- *   7. Акции и скидки — sarlavha panel + 3 karta grid + Загрузить ещё
- *   8. Что говорят о нас — sarlavha + 3 testimonial karta
- *   9. CTA — "Подарите интерьеру особенный характер" band
- *   10. Footer — 5 kolonka (brand+social + 4 link kolonkasi)
+ * Diqqat: Header `sticky` — u faqat SHU <main> ichida qotib turadi.
+ * Yangi bo'limlar ham shu <main> ichida bo'lishi shart, aks holda
+ * scroll paytida header ular ustida qolmaydi.
+ *
+ * TEPADAGI 20px (`pt-5`):
+ *   Figma'da bar tepadan 20px pastda boshlanadi (Rectangle 56, y=20).
+ *   Bu bo'shliq ataylab <main> da, Header ichida EMAS: header'dan tashqarida
+ *   bo'lgani uchun scroll paytida yo'qoladi va header top:0 ga taqalib
+ *   qotadi. Agar bo'shliq sticky element ichida bo'lsa — hech qachon
+ *   yo'qolmaydi va header qimirlamay qolar edi.
+ *
+ * RANG — bitta manba (`--elx-bg`):
+ *   Sahifa foni, header bar'i va avatar paneli SHU o'zgaruvchini ishlatadi.
+ *   Shuning uchun rang bir joyda o'zgartirilsa, uchalasi birga o'zgaradi —
+ *   avatar paneli har doim sayt foni bilan bir xil bo'lib qoladi.
+ *
+ *   Hozircha qiymat Figma'dan (#5E2C1A). Tenant rangiga ulash bir qator:
+ *   `shop.primaryColor` — lekin Elexus DB'sida u `#1A1A1A` (deyarli qora),
+ *   ya'ni dizayndagi jigarrang emas. DB'da rang to'g'rilangach ulash mumkin.
  */
 type Props = {
   shop: TenantShop;
 };
 
-export default function HomeElexus({ shop }: Props) {
-  const brand = shop.title || "Elexus Hali";
-  const phone = shop.phone || "90 123 45 67";
-  const address = shop.address || "Uzbekistan, Tashkent, Aloqa, street 28";
+/** Elexus yuza rangi — Figma (hero foni 100:282, header bar 100:451,
+ *  avatar paneli 100:314, «О нас» paneli 240:2598 — hammasi shu rang). */
+const ELEXUS_BG = "#74301c";
 
+export default function HomeElexus({ shop }: Props) {
   return (
-    <div
-      className="bg-white text-[#171717] antialiased"
+    <main
+      className="min-h-screen bg-[color:var(--elx-bg,#74301c)] pt-5 antialiased"
+      style={{ ["--elx-bg" as string]: ELEXUS_BG }}
       data-tenant={shop.slug}
     >
-      <ElexusHeader shop={shop} />
-      <HeroElexus phone={phone} address={address} />
-      <UslublarSection />
-      <AboutSection />
-      <PortfolioSection />
+      <Header />
+      <Hero />
+
+      {/* Hero'dan keyingi birinchi seksiya — bu yerdan sahifa fon rangi
+            krem (#F4EFE9) ga o'tadi (Figma: jigarrang hero bandi y=940 da
+            tugaydi). */}
+      <StylesSection />
       <ProductsSection />
-      <PromotionsSection />
-      <TestimonialsSection />
-      <CtaSection />
-      <FooterElexus phone={phone} address={address} brand={brand} />
-    </div>
+      <DiscountsSection />
+      <AboutSection />
+      {/* «О нас» ning pastki padding'i YO'Q — Figma'dagi 100px shu
+            seksiyaning `pt-[100px]` ida, bitta joyda. */}
+      <PortfolioSection />
+      <ReviewsSection />
+      <PromoBannerSection />
+      <Footer />
+    </main>
   );
 }

@@ -1,39 +1,42 @@
-import ElexusHeader from "@/components/elexus/header";
-import CtaSection from "@/components/elexus/cta";
-import FooterElexus from "@/components/elexus/footer";
-import CatalogLayout from "@/components/elexus/catalog-layout";
+import Header from "@/components/elexus/header";
+import CatalogToolbar from "@/components/elexus/catalog-toolbar";
+import CatalogListing from "@/components/elexus/catalog-listing";
+import PromoBannerSection from "@/components/elexus/promo-banner-section";
+import Footer from "@/components/elexus/footer";
+import { CATALOG_COLLECTIONS, pickRandomProducts } from "@/data/catalog-elexus";
 import type { TenantShop } from "@/service/tenant-shop";
 
-/**
- * Elexus Catalog page (Figma 276:17).
+/*
+ * Elexus Catalog — Figma frame 100:625.
+ * Header "light" variantda (bu sahifada hero yo'q, fon krem #F4EFE9 —
+ * home-elexus.tsx'dagi jigarrang hero fonidan farqli, Group24 y=0'da,
+ * 20px tepa bo'shliqsiz).
  *
- * Struktura:
- *   - Header (sticky)
- *   - CatalogLayout:
- *     • Left sidebar: Сортировка / Фильтр / Коллекции (fixed 360w)
- *     • Main: 3 ta product card (image chapda + details o'ngda)
- *     • Right panel: promo/banner (fixed 599w)
- *   - CTA banner
- *   - Footer
+ * Har qator — bitta KOLLEKSIYA (src/data/catalog-elexus.ts). Ko'rsatiladigan
+ * 2 rasm — tasodifiy tanlangan modellar (`pickRandomProducts`, SERVER
+ * component'da bir marta — hydration mos kelmasligi yo'q). Natija
+ * `CatalogListing`ga (client) beriladi — u "Посмотреть все" bosilganda
+ * sahifa ichida (navigatsiyasiz) kolleksiyaning to'liq to'rini animatsiya
+ * bilan ochadi.
  */
+
 type Props = {
   shop: TenantShop;
 };
 
 export default function CatalogElexus({ shop }: Props) {
-  const brand = shop.title || "Elexus Hali";
-  const phone = shop.phone || "90 123 45 67";
-  const address = shop.address || "Uzbekistan, Tashkent, Aloqa, street 28";
+  const collections = CATALOG_COLLECTIONS.map((collection) => ({
+    collection,
+    preview: pickRandomProducts(collection.products, 2),
+  }));
 
   return (
-    <div
-      className="bg-white text-[#171717] antialiased"
-      data-tenant={shop.slug}
-    >
-      <ElexusHeader shop={shop} />
-      <CatalogLayout />
-      <CtaSection />
-      <FooterElexus phone={phone} address={address} brand={brand} />
-    </div>
+    <main className="min-h-screen bg-[#F4EFE9]" data-tenant={shop.slug}>
+      <Header variant="light" />
+      <CatalogToolbar />
+      <CatalogListing collections={collections} />
+      <PromoBannerSection />
+      <Footer />
+    </main>
   );
 }

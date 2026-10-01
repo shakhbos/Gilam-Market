@@ -83,3 +83,54 @@ button {
 .ant-select-selector {
   border: none !important;
 }
+
+/* Elexus — "pastdan suzib chiqish" animatsiyasi (catalog-collection-grid.tsx,
+   "Посмотреть все" sahifa ichida ochilganda). */
+@keyframes elx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-elx-rise {
+  animation: elx-rise 500ms cubic-bezier(0.33, 0, 0.2, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-elx-rise {
+    animation: none;
+  }
+}
+
+/* Elexus — mahsulot rasmi "ko'chib o'tish" animatsiyasi (View Transitions API,
+   catalog-listing.tsx: productImageTransitionName). Brauzerning sukut
+   tezligi (~250ms, keskin) juda tez tuyulardi — foydalanuvchini "xotirjam"
+   ushlab turish uchun sekinroq va yumshoqroq qilindi:
+     - `::view-transition-group` — rasmning o'zi (joyi/o'lchami) qanchalik
+       sekin ko'chishini boshqaradi — bu ASOSIY "morph" hissi, shuning
+       uchun eng uzun davomiylik shu yerda.
+     - `::view-transition-old/new` — atrofdagi kontent (matn, panel)
+       cross-fade tezligi — biroz qisqaroq, aks holda yangi sahifa matni
+       rasm ko'chib bo'lguncha ko'rinmay "kechikkandek" tuyulardi.
+   `*` — bu saytda faqat BITTA turdagi nom ishlatiladi (mahsulot rasmi),
+   shuning uchun universal selektor xavfsiz — boshqa hech narsaga
+   ta'sir qilmaydi. */
+::view-transition-group(*) {
+  animation-duration: 550ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 400ms;
+  animation-timing-function: ease-in-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 1ms;
+  }
+}

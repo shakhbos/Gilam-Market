@@ -9,13 +9,20 @@ import StoreProvider from "./store-provider";
 import { ToastContainer } from 'react-toastify';
 import { Metadata } from 'next';
 import { SITE_URL } from '../../utils/seo';
-import { Inter } from 'next/font/google';
+import { Inter, Inter_Tight } from 'next/font/google';
 import { Suspense } from "react";
 import Metrika from "@/components/Metrika";
 import type { LayoutProps, MetadataProps } from '@/types/next';
 import { getTenantShop } from "../../service/tenant-shop";
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] });
+// Elexus brand fonti — Figma spec bo'yicha hero + boshqa sahifalarda ishlatiladi.
+// CSS variable orqali: style={{ fontFamily: 'var(--font-inter-tight)' }}.
+const interTight = Inter_Tight({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-inter-tight',
+});
 
 // Fallback ranglar — tenant shop primary/secondary ranglar yo'q bo'lsa
 const DEFAULT_PRIMARY = "#2299DD";
@@ -121,6 +128,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
   return (
     <html
       lang={locale}
+      className={interTight.variable}
       style={{
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ["--tenant-primary" as any]: primary,

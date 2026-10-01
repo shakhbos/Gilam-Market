@@ -1,141 +1,251 @@
-"use client";
+import { Facebook, Instagram, Linkedin, Send, Twitter } from "lucide-react";
 
+import Container from "./container";
 import { Link } from "@/i18n/routing";
 
-/**
- * Footer seksiyasi (Figma 333:736, 333:770-775, 333:854-863, 333:519-571).
+/*
+ * Elexus — Footer.
+ * Figma frame 100:281, y=5930..6169. Bolalar bitta wrapping frame'ga
+ * yig'ilmagan — brend bloki, ijtimoiy tarmoq to'ri va 4 ustun Frame 15 ning
+ * to'g'ridan-to'g'ri farzandlari (100:380..429).
+ * ═════════════════════════════════════════════════════════════════════════
+ * 12-KOLONKA GRID (sahifaning boshqa hamma seksiyasi bilan bir xil tizim —
+ * Container > grid-cols-12, shu bilan responsiveness ham bepul keladi):
+ *   Brend bloki (logo + kontakt)   col-start-1, col-span-2
+ *   Qolgan hammasi (ijtimoiy to'r
+ *   + 4 ustun)                     col-start-4, col-span-9
  *
- * Layout:
- *   - Chapda: "Elexus Hali" brand + для связи + phone + address + social iconlar
- *     grid (3×2, 56×56 kvadrat), 4 dona brand icon
- *   - O'ngda: 4 kolonka (Магазин / Клиенту / Помощь / Ташкент)
- *   - Ostda: copyright chizigi
+ *   Ikkalasi ham mobil/tablet'da col-span-12 ga tushib ustma-ust oqadi —
+ *   alohida "mobil versiya" JSX YO'Q, xuddi shu bitta grid breakpoint bilan
+ *   javob beradi (ProductsSection/StylesSection kabi).
+ *
+ * col-4 ICHIDAGI joylashuv (Figma piksellari, kontent chetiga nisbatan,
+ * ya'ni Figma x − 100 − 433.5 [c4 boshlanishi]):
+ *   Ijtimoiy to'r   0    (100:416 Rectangle 89 x=534 ≈ c4=433.5 — deyarli
+ *                   aynan, header/hero bilan bir xil grid'ga tushadi)
+ *   Магазин         ~244 (678−434)
+ *   Клиенту         ~444 (878−434)
+ *   Помощь          ~644 (1078−434)
+ *   Ташкент         ~844 (1278−434)
+ *
+ *   Ijtimoiy to'r → Магазин oralig'i 68px, keyingi uchtasi orasida esa aynan
+ *   100px (barchasi o'lchangan, piksel darajasida tekshirilgan). Bu qator
+ *   12-kolonka grid'iga tushmaydi (About seksiyasidagi kabi — Figma'da bu
+ *   qismga mobil freym ham yo'q), shuning uchun col-4 ICHIDA flex + aniq
+ *   gap qiymatlari ishlatiladi, faqat TASHQI joylashuv (col-4) grid'ga
+ *   bog'langan.
+ *
+ * IJTIMOIY TARMOQ — 5 TA, 6 EMAS:
+ *   Figma'da Rectangle 89/90/91/82/92 — besh dona 56×56 katak, 4px oraliq,
+ *   3 tadan qatorga (3+2) o'raladi; olтinchi "bo'sh katak" degan narsa YO'Q,
+ *   shunchaki 5-element 2-qatorga o'tadi. Shuning uchun grid-rows-2 + soxta
+ *   bo'sh <span> emas — `flex flex-wrap` qat'iy 176px (=56×3+4×2) kenglikda,
+ *   5-element o'zi tabiiy ravishda ikkinchi qatorga o'raladi.
+ *
+ * Y (barchasi qator tepasidan, y=5930):
+ *   Brend/ijtimoiy to'r/ustun sarlavhalari — offset 0 (bir chiziqda).
+ *   Ustun HAVOLALARI — offset 36 (y=5966−5930): sarlavha (h=21, 14px/1.5)
+ *   + 15px oraliq (5966−5951).
+ *   Havolalar orasi 7px (24−17, matn 14px/normal ≈ h=17).
+ *
+ *   Brend bloki ichida (Elexus/"для связи:"/telefon/manzil) bbox'lar deyarli
+ *   TEGIB turadi (masalan для связи: y=5969 = Elexus tugashi 5930+39=5969,
+ *   aynan 0px) — shuning uchun oraliqsiz (`gap` yo'q), faqat shrift oqimi.
+ *
+ *   © qatori y=6111 — Магазин ustuni tugashidan (5930+21+15+5×17+4×7=6079)
+ *   32px past.
  */
 
-type Props = {
-  phone: string;
-  address: string;
-  brand?: string;
-};
+type NavLink = { label: string; href: string };
+type NavColumn = { heading: string; links: readonly NavLink[] };
 
-const COLUMNS = [
+const NAV_COLUMNS: readonly NavColumn[] = [
   {
-    title: "Магазин",
-    links: ["О нас", "Каталог", "Коллекции", "Новинки", "Акции"],
+    heading: "Магазин",
+    links: [
+      { label: "О нас", href: "/about" },
+      { label: "Каталог", href: "/catalog" },
+      { label: "Коллекции", href: "/catalog" },
+      { label: "Новинки", href: "/catalog" },
+      { label: "Акции", href: "/catalog" },
+    ],
   },
   {
-    title: "Клиенту",
-    links: ["Доставка", "Возврат", "Примерка", "AR-примерка"],
+    heading: "Клиенту",
+    links: [
+      { label: "Доставка", href: "/delivery" },
+      { label: "Возврат", href: "#" },
+      { label: "Примерка", href: "#" },
+      { label: "AR-примерка", href: "#ar" },
+    ],
   },
   {
-    title: "Помощь",
-    links: ["FAQ", "Уход за ковром", "Гарантия", "Оплата"],
+    heading: "Помощь",
+    links: [
+      { label: "FAQ", href: "#" },
+      { label: "Уход за ковром", href: "#" },
+      { label: "Гарантия", href: "#" },
+      { label: "Оплата", href: "/payment" },
+    ],
   },
 ];
 
-const CONTACT_COLUMN = {
-  title: "Ташкент",
-  links: [
-    { text: "+998 71 000-00-00", href: "tel:+998710000000" },
-    { text: "info@elexus.uz", href: "mailto:info@elexus.uz" },
-    { text: "Instagram", href: "https://instagram.com/elexus" },
-    { text: "Telegram", href: "https://t.me/elexus" },
-  ],
-};
+const SOCIAL_LINKS = [
+  { label: "Instagram", href: "#", Icon: Instagram },
+  { label: "Telegram", href: "#", Icon: Send },
+  { label: "Facebook", href: "#", Icon: Facebook },
+  { label: "LinkedIn", href: "#", Icon: Linkedin },
+  { label: "Twitter", href: "#", Icon: Twitter },
+] as const;
 
-/* Social ikonlari — Figma 3×2 grid da (Rectangle 78-82) */
-function SocialGrid() {
-  const items = [
-    { name: "instagram", path: "M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 3.5c1.5 0 5 .2 5 3.5h-3.5c-.3-.7-1-1.2-1.5-1.2s-1.2.5-1.5 1.2H7c0-3.3 3.5-3.5 5-3.5zm-5 5.5h10c0 3.5-1.5 5.5-5 5.5s-5-2-5-5.5z" },
-    { name: "telegram", path: "M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm4.7 6.9l-1.6 7.5c-.1.5-.4.7-.9.4l-2.4-1.8-1.2 1.1c-.1.1-.2.2-.5.2l.2-2.5 4.5-4.1c.2-.2-.05-.3-.3-.1L9 12.9l-2.4-.7c-.5-.2-.5-.5.1-.7l9.6-3.7c.4-.15.8.1.4 1.1z" },
-    { name: "facebook", path: "M12 2C6.5 2 2 6.5 2 12c0 5 3.7 9.1 8.4 9.9v-7H8v-2.9h2.4V9.4c0-2.4 1.4-3.7 3.6-3.7 1 0 2.1.2 2.1.2v2.3h-1.2c-1.2 0-1.5.7-1.5 1.5V12h2.7l-.4 2.9h-2.3v7c4.7-.8 8.4-4.9 8.4-9.9 0-5.5-4.5-10-10-10z" },
-    { name: "linkedin", path: "M20.4 2H3.6C2.7 2 2 2.7 2 3.6v16.8c0 .9.7 1.6 1.6 1.6h16.8c.9 0 1.6-.7 1.6-1.6V3.6c0-.9-.7-1.6-1.6-1.6zM8 19H5V9h3v10zm-1.5-11.3c-1 0-1.7-.8-1.7-1.7s.8-1.7 1.7-1.7 1.7.8 1.7 1.7-.7 1.7-1.7 1.7zM19 19h-3v-5c0-1.2-.4-2-1.5-2s-1.5.7-1.5 2v5h-3V9h3v1.4c.5-.7 1.4-1.6 3-1.6 2.2 0 3 1.4 3 4V19z" },
-    { name: "twitter", path: "M22 5.9c-.7.3-1.5.5-2.3.6.8-.5 1.5-1.3 1.8-2.2-.8.5-1.6.8-2.5 1-.7-.8-1.7-1.3-2.9-1.3-2.2 0-4 1.8-4 4 0 .3 0 .6.1.9-3.3-.2-6.3-1.7-8.3-4.1-.3.6-.5 1.3-.5 2 0 1.4.7 2.6 1.8 3.3-.7 0-1.3-.2-1.8-.5 0 2 1.4 3.6 3.2 4-.3.1-.7.1-1.1.1-.3 0-.5 0-.8-.1.5 1.6 2 2.8 3.8 2.8-1.4 1.1-3.1 1.7-5 1.7-.3 0-.7 0-1-.1 1.8 1.2 4 1.9 6.3 1.9 7.5 0 11.7-6.2 11.7-11.7v-.5c.8-.6 1.5-1.3 2-2.1z" },
-  ];
+/** Sarlavha — Figma: 14px/1.5, #7E7C78, UPPERCASE. */
+function ColumnHeading({ children }: { children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-3 gap-[4px]">
-      {items.map((s, i) => (
+    <h3 className="text-[14px] uppercase leading-[1.5] text-[#7E7C78]">
+      {children}
+    </h3>
+  );
+}
+
+function BrandBlock() {
+  return (
+    <div className="flex flex-col" data-node-id="100:380">
+      <Link
+        href="/"
+        className="text-[32px] font-semibold leading-none tracking-[-0.96px] text-black"
+      >
+        Elexus
+      </Link>
+      <div>
+        <p className="text-[14px] uppercase leading-[1.5] text-[#7E7C78]" data-node-id="100:407">
+          для связи:
+        </p>
         <a
-          key={i}
-          href={`#${s.name}`}
-          aria-label={s.name}
-          className="flex h-[56px] w-[56px] items-center justify-center rounded-[8px] bg-black/[0.04] text-black transition-colors hover:bg-black hover:text-white"
+          href="tel:+998900123456"
+          className="block text-[28px] font-semibold leading-[1.2] text-black transition-opacity duration-150 hover:opacity-70"
+          data-node-id="100:406"
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d={s.path} />
-          </svg>
+          90 123 45 67
+        </a>
+      </div>
+      <p className="max-w-[232px] text-[14px] leading-[1.5] text-[#7E7C78]" data-node-id="100:409">
+        Uzbekistan, Tashkent, Aloqa, street 28
+      </p>
+    </div>
+  );
+}
+
+/** 5 ta ikonka, 56px katak, 4px oraliq, 176px kenglikda 3+2 bo'lib o'raladi. */
+function SocialGrid() {
+  return (
+    <div className="flex w-[176px] flex-wrap gap-1" data-node-id="100:416">
+      {SOCIAL_LINKS.map(({ label, href, Icon }) => (
+        <a
+          key={label}
+          href={href}
+          aria-label={label}
+          className="flex size-14 shrink-0 items-center justify-center bg-white text-[#222] transition-opacity duration-150 hover:opacity-60"
+        >
+          <Icon size={20} strokeWidth={1.5} />
         </a>
       ))}
     </div>
   );
 }
 
-export default function FooterElexus({ phone, address, brand = "Elexus Hali" }: Props) {
+/**
+ * Figma'da har ustun 100px'lik QAT'IY freym (Frame32/33/34/35 width=100) —
+ * matn undan uzun bo'lsa ham (masalan telefon raqami 124px) freym kengligi
+ * o'zgarmaydi, matn shunchaki bir qatorda tashqariga chiqadi. Keyingi ustun
+ * shu 100px'dan SO'NG яна 100px gap bilan boshlanadi (jami qadam 200px) —
+ * shuning uchun bu yerda ham qat'iy `w-[100px]` + `whitespace-nowrap`,
+ * "hug content" emas — aks holda qisqa so'zli ustunlar torayib, keyingi
+ * ustunni chapga suradi va qadam Figma'dagi 200px'dan og'ib ketadi.
+ */
+function NavColumnBlock({ col }: { col: NavColumn }) {
   return (
-    <footer data-section="footer" className="w-full bg-white pb-[40px] pt-[80px]">
-      <div className="mx-auto max-w-[1728px] px-[40px] sm:px-[60px] lg:px-[80px]">
-        <div className="grid grid-cols-1 gap-[40px] lg:grid-cols-[minmax(0,340px)_repeat(4,1fr)]">
-          {/* Brand kolonka + social */}
-          <div className="flex flex-col gap-[16px]">
-            <h3 className="text-[32px] font-black uppercase tracking-tight text-black">
-              {brand}
-            </h3>
-            <div className="flex flex-col gap-[6px]">
-              <span className="text-[13px] text-black/60">для связи:</span>
-              <span className="text-[24px] font-bold text-black">{phone}</span>
-              <span className="text-[13px] font-medium text-black/80">
-                {address}
-              </span>
-            </div>
-            <SocialGrid />
+    <div className="flex w-[100px] shrink-0 flex-col gap-[15px]">
+      <ColumnHeading>{col.heading}</ColumnHeading>
+      <ul className="flex flex-col gap-[7px]">
+        {col.links.map((l) => (
+          <li key={l.label}>
+            <Link
+              href={l.href}
+              className="whitespace-nowrap text-[14px] leading-[normal] text-[#222] transition-opacity duration-150 hover:opacity-60"
+            >
+              {l.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** "Ташкент" — shahar nomi sarlavha, ostida kontakt havolalari. */
+function ContactColumn() {
+  return (
+    <div className="flex w-[100px] shrink-0 flex-col gap-[15px]" data-node-id="100:393">
+      <ColumnHeading>Ташкент</ColumnHeading>
+      <ul className="flex flex-col gap-[7px] whitespace-nowrap text-[14px] leading-[normal] text-[#222]">
+        <li>
+          <a href="tel:+998710000000" className="transition-opacity duration-150 hover:opacity-60">
+            +998 71 000-00-00
+          </a>
+        </li>
+        <li>
+          <a href="mailto:info@elexus.uz" className="transition-opacity duration-150 hover:opacity-60">
+            info@elexus.uz
+          </a>
+        </li>
+        <li>
+          <a href="#" className="transition-opacity duration-150 hover:opacity-60">
+            Instagram
+          </a>
+        </li>
+        <li>
+          <a href="#" className="transition-opacity duration-150 hover:opacity-60">
+            Telegram
+          </a>
+        </li>
+      </ul>
+    </div>
+  );
+}
+
+export default function Footer() {
+  return (
+    <footer
+      className="w-full bg-[#F4EFE9] pb-10 pt-[100px]"
+      style={{ fontFamily: "var(--font-inter-tight), Inter, sans-serif" }}
+    >
+      <Container>
+        <div className="grid grid-cols-12 gap-x-[14px] gap-y-10">
+          {/* Brend — col 1-2. */}
+          <div className="col-span-12 sm:col-span-6 lg:col-span-2 lg:col-start-1">
+            <BrandBlock />
           </div>
 
-          {/* 3 ta link kolonkasi */}
-          {COLUMNS.map((c, i) => (
-            <div key={i} className="flex flex-col gap-[16px]">
-              <h4 className="text-[18px] font-bold text-black">{c.title}</h4>
-              <ul className="flex flex-col gap-[10px]">
-                {c.links.map((l, j) => (
-                  <li key={j}>
-                    <Link
-                      href={`/${l.toLowerCase().replace(/\s+/g, "-")}`}
-                      className="text-[14px] text-black/70 hover:text-black"
-                    >
-                      {l}
-                    </Link>
-                  </li>
+          {/* Ijtimoiy to'r + 4 ustun — col 4-12. Ichkarida flex + aniq
+                oraliqlar (68px ijtimoiy→Магазин, 100px har bir ustun
+                orasida — o'lchangan qiymatlar, grid'ga tushmaydi). */}
+          <div className="col-span-12 lg:col-span-9 lg:col-start-4">
+            <div className="flex flex-wrap gap-x-[68px] gap-y-10">
+              <SocialGrid />
+              <div className="flex flex-wrap gap-x-[100px] gap-y-10">
+                {NAV_COLUMNS.map((col) => (
+                  <NavColumnBlock key={col.heading} col={col} />
                 ))}
-              </ul>
+                <ContactColumn />
+              </div>
             </div>
-          ))}
-
-          {/* Kontakt kolonkasi */}
-          <div className="flex flex-col gap-[16px]">
-            <h4 className="text-[18px] font-bold text-black">
-              {CONTACT_COLUMN.title}
-            </h4>
-            <ul className="flex flex-col gap-[10px]">
-              {CONTACT_COLUMN.links.map((l, j) => (
-                <li key={j}>
-                  <a
-                    href={l.href}
-                    className="text-[14px] text-black/70 hover:text-black"
-                  >
-                    {l.text}
-                  </a>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
 
-        {/* Copyright chizigi */}
-        <div className="mt-[60px] flex justify-start border-t border-black/10 pt-[24px]">
-          <span className="text-[13px] text-black/60">
-            © 2026 · Дом ковровых изделий
-          </span>
-        </div>
-      </div>
+        <p className="mt-8 text-[14px] leading-[1.5] text-[#7E7C78]" data-node-id="100:408">
+          © {new Date().getFullYear()} · Дом ковровых изделий
+        </p>
+      </Container>
     </footer>
   );
 }

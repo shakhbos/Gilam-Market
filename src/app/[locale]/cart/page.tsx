@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { getTenantShop } from "@/service/tenant-shop";
-import CatalogElexus from "@/views/catalog-elexus";
+import CartElexus from "@/views/cart-elexus";
 import { localizedAlternates } from "@/utils/metadata";
 import type { PageProps } from "@/types/next";
 
@@ -11,22 +11,21 @@ export async function generateMetadata({
 }: PageProps<{ locale: string }, Record<string, never>>): Promise<Metadata> {
   const { locale } = await params;
   const shop = await getTenantShop();
-  const title = shop?.slug === "elexus" ? "Каталог — Elexus Gilam" : "Каталог";
+  const title = shop?.slug === "elexus" ? "Корзина — Elexus Gilam" : "Корзина";
   return {
     title,
-    alternates: localizedAlternates(locale, "/catalog"),
+    alternates: localizedAlternates(locale, "/cart"),
   };
 }
 
 /**
- * /catalog sahifa — hozircha faqat Elexus tenant uchun aktiv (Figma frame
- * 100:625). Boshqa tenantlar hali bu sahifaga ega emas, shuning uchun
- * default holat 404 ga o'tadi.
+ * /cart sahifa — hozircha faqat Elexus tenant uchun aktiv (Figma frame
+ * 100:931), /catalog va /catalog/[collection]/[model] bilan bir xil qoida.
  */
-export default async function CatalogPage() {
+export default async function CartPage() {
   const shop = await getTenantShop();
   if (shop?.slug === "elexus") {
-    return <CatalogElexus shop={shop} />;
+    return <CartElexus shop={shop} />;
   }
   notFound();
 }

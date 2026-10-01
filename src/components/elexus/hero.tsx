@@ -1,160 +1,170 @@
-"use client";
+import Container from "./container";
+import HeroShowcase, { type HeroSlide } from "./hero-showcase";
 
-import { motion } from "motion/react";
-
-type Props = {
-  phone: string;
-  address: string;
-  /** Fon video (mp4/webm). Yuklangach shu path bo'ladi. */
-  videoSrc?: string;
-  /** Video bo'lmasa fallback rasm. */
-  posterSrc?: string;
-};
-
-/**
- * Elexus New Home Hero (Figma 333:899-908).
+/*
+ * Elexus Hero — asosiy sarlavha + undan keyingi showcase bloki.
+ * Figma frame 100:281, node 200:2508 (Frame 50).
+ * ─────────────────────────────────────────────────────────────────────────
+ * FIGMA O'LCHAMLARI (1920px freym, kontent 1720px, chekka margin 100px):
+ *   Frame 50   x=100  y=100  w=894  h=144
+ *     satr 1   "Плотность важнее рисунка. Миллион"        h=48  o'ngga tekis
+ *     satr 2   "узлов на метре держат линию так, как не"  h=48  chapga
+ *     satr 3   "удержит печать."                          h=48  chapga
  *
- * Struktura (Figma 1728×1037 → responsive):
- *   - Fon: video yoki poster rasm, butun sahifa keng, ~60vh baland
- *   - Chap: Tashkent, Aloqa street 28 (56px) + 90 123 45 67 (56px)
- *   - O'ng: description matni (24px) + "Mutaxasis yollash" 220×60 pill
- *   - Ustida (alohida): sticky header
+ *   x=100 → kontentga nisbatan 0 → grid'ning 1-KOLONKASI (header logosi
+ *   bilan bir chiziqda). Shuning uchun blok `col-start-1`.
+ *   y=100 → header bar y=20..80 da tugaydi, ya'ni undan aynan 20px pastda.
  *
- * Figma pozitsiyalari (1728 kanvas):
- *   - Chap matn: x=284 (16.4%), y=337-478 (address y=337, phone y=418)
- *   - O'ng matn: x=944 (54.6%), y=342-488 (desc y=342, button y=428)
+ * KENGLIK — HARDCODE EMAS, MATNDAN (auto-layout "hug"):
+ *   894px sehrli raqam emas: bu 2-satrning 40px Inter Tight Medium'dagi
+ *   tabiiy kengligi (o'lchandi: 893px). Shuning uchun konteyner `w-fit` —
+ *   eng keng satr (2-satr) kenglikni belgilaydi, qolgan ikkitasi flex'ning
+ *   `stretch`i bilan o'sha kenglikka cho'ziladi.
  *
- * Ease: OUT_EXPO cubic-bezier(0.19, 1, 0.22, 1) — waabi.ai palettidan.
+ * ZINAPOYA (Figma: 1-satr o'ngga, 2 va 3 chapga):
+ *   Uchalasi bir xil kenglikda bo'lgani uchun
+ *     1-satr  → 2-satrga O'NGDAN tekislanadi (text-right)
+ *     3-satr  → 2-satrga CHAPDAN tekislanadi (text-left)
+ *   Ya'ni 2-satr — mos yozuvlar nuqtasi.
+ *
+ * TIPOGRAFIYA:
+ *   Inter Tight Medium (500) · 40px · #e0caab · UPPERCASE
+ *   Har satr 48px → leading 48/40 = 1.2 (3 × 48 = 144px).
+ *
+ * RESPONSIV:
+ *   Shrift 40px va fluid shkalasi YO'Q — `w-fit` = min(max-content, mavjud
+ *   joy), shuning uchun kontent 2-satr kengligidan (≈893px) keng bo'lguncha
+ *   hech narsa o'ralmaydi ham, kichraymaydi ham — bu viewport ≥ ~934px.
+ *   Undan tor ekranda quti mavjud joyga qisqaradi va satrlar o'raladi.
+ *
+ *   Yagona istisno: viewport < 440px da shrift 40px → 36px
+ *   (`max-[439.98px]:text-[36px]`). .98 — kasrli viewport kengliklarida
+ *   440px chegarasida bo'shliq qolmasligi uchun.
  */
 
-const OUT_EXPO: [number, number, number, number] = [0.19, 1, 0.22, 1];
+/** Figma satrlari — alohida text node'lar, tartibi va tekislanishi bilan. */
+const LINES = [
+  { text: "Плотность важнее рисунка. Миллион", align: "text-right" },
+  { text: "узлов на метре держат линию так, как не", align: "text-left" },
+  { text: "удержит печать.", align: "text-left" },
+] as const;
 
-export default function HeroElexus({
-  phone,
-  address,
-  videoSrc,
-  // Vaqtinchalik: /public/elexus/hero.jpg dan rasm oladi. Fayl bo'lmasa
-  // Unsplash placeholder ishlatiladi (browser fallback CSS ostida).
-  posterSrc = "/elexus/hero.jpg",
-}: Props) {
+/*
+ * DEMO ma'lumot — hozircha hero uchun API yo'q.
+ * 1-slaydning `specs`lari Figma Frame 51 dan (200:2509…2512), rasmlar ham
+ * Figma'dan yuklab olingan. Backend tayyor bo'lgach shu massiv props orqali
+ * almashtiriladi — komponent butunlay ma'lumotga asoslangan.
+ *
+ * 2-slaydda `author` bor: Figma karuselida aynan shu thumbnail doira
+ * ko'rinishida (image 4, 100:289) — ya'ni sharh muallifi slaydi.
+ * Uning `video`si yo'q, shuning uchun demo'da ovoz tugmasi chiqmaydi;
+ * `author.video` berilgan zahoti hover'da paydo bo'ladi.
+ */
+const DEMO_SLIDES: readonly HeroSlide[] = [
+  {
+    // 1-slaydda avatar bor: orqa fon Figma'ning "Rectangle 60" rasmi,
+    // avatar esa Figma'ning dumaloq "image 4" rasmi — ikkalasi ham Figma'dan,
+    // lekin turli rasm (bitta rasm ikki joyda takrorlanmasin).
+    id: "review",
+    // Description — Figma Frame 51 (200:2509…2512).
+    specs: [
+      "1 000 000 узлов на м²",
+      "Ворс 12 мм; шерсть корк и шёлк",
+      "Двойной персидский узел",
+      "Иран",
+    ],
+    thumb: "/elexus/carpet-1.png",
+    // Banner va avatar — Figma media zonasidan (x=537 y=258, 1282×591).
+    media: {
+      kind: "image",
+      src: "/elexus/hero-banner.png",
+      alt: "Elexus gilam salonи",
+    },
+    author: {
+      name: "Обзор от эксперта",
+      image: "/elexus/avatar-review.png",
+      // Figma'dagi aniq kadr: manba to'liq bo'y surat, doirada faqat yuz
+      // ko'rinishi uchun zumlangan (node 100:315 transformi).
+      imageCrop: {
+        width: "364.93%",
+        height: "405.38%",
+        left: "-161.95%",
+        top: "-87.31%",
+      },
+    },
+  },
+  {
+    id: "tabriz",
+    specs: [
+      "Отзыв клиента",
+      "Тебриз 60 радж",
+      "Выбран дома при своём свете",
+      "Тошкент",
+    ],
+    thumb: "/elexus/carpet-2.png",
+    media: { kind: "image", src: "/elexus/carpet-2.png", alt: "Tabriz gilami" },
+  },
+  {
+    id: "aspendos",
+    specs: [
+      "700 000 узлов на м²",
+      "Ворс 9 мм; шерсть",
+      "Турецкий узел",
+      "Кайсери",
+    ],
+    thumb: "/elexus/carpet-3.png",
+    media: { kind: "image", src: "/elexus/carpet-3.png", alt: "Aspendos gilami" },
+  },
+  {
+    id: "hera",
+    specs: [
+      "500 000 узлов на м²",
+      "Ворс 10 мм; шерсть и вискоза",
+      "Плоское плетение",
+      "Хива",
+    ],
+    thumb: "/elexus/carpet-4.png",
+    media: { kind: "image", src: "/elexus/carpet-4.png", alt: "Hera gilami" },
+  },
+];
+
+export default function Hero({
+  slides = DEMO_SLIDES,
+}: {
+  slides?: readonly HeroSlide[];
+}) {
+  // Balandlik kontent bo'yicha (min-h yo'q), pastdan 80px padding — shunda
+  // keyingi seksiya hero ostidan ko'rinib turadi. Yuqoridagi 20px esa
+  // Figma'dagi header↔title masofasi (y=80 → y=100).
   return (
-    <section
-      data-section="hero"
-      className="relative w-full overflow-hidden bg-black"
-      // Header (80px) dan pastda to'liq viewport egallaydi. Barcha ekranlarda
-      // baland aksept qiladi (mobile pastroq).
-      style={{ height: "calc(100vh - 80px)", minHeight: "520px" }}
-    >
-      {/* Fon: video yoki rasm */}
-      {videoSrc ? (
-        <video
-          src={videoSrc}
-          poster={posterSrc}
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      ) : (
-        <img
-          src={posterSrc}
-          alt="Elexus Gilam showroom"
-          className="absolute inset-0 h-full w-full object-cover"
-          draggable={false}
-          onError={(e) => {
-            // Fayl yo'q bo'lsa Unsplash placeholder'ga o'tish
-            const img = e.currentTarget;
-            if (
-              !img.src.includes("unsplash")
-            ) {
-              // Vaqtinchalik: gilam showroom uslubidagi rasm — kelajakda
-              // /elexus/hero.jpg fayli qo'yilgach shu URL avtomatik ishlaydi.
-              img.src =
-                "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=2400&q=80";
-            }
-          }}
-        />
-      )}
-
-      {/* Overlay gradient — matn o'qish uchun (chap va o'ng) */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.15) 25%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.5) 100%)",
-        }}
-      />
-
-      {/* ── Content grid: chap (address+phone) va o'ng (desc+button) ── */}
-      <div
-        className="relative z-10 mx-auto grid h-full max-w-[1728px] items-center px-[40px] sm:px-[60px] lg:px-[80px]"
-        // Figma: x=284 va x=944 (mos ravishda 16.4% va 54.6% dan chapdan boshlanadi).
-        // Grid'da 2 kolonka: 55% (chap) va 45% (o'ng).
-        style={{
-          gridTemplateColumns: "minmax(0, 55%) minmax(0, 45%)",
-          columnGap: "40px",
-        }}
-      >
-        {/* Chap: address (katta) + phone (katta) */}
-        <motion.div
-          initial={{ opacity: 0, x: -60 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1, ease: OUT_EXPO, delay: 0.2 }}
-          className="flex flex-col gap-[24px] text-white"
-        >
-          <span
-            className="font-semibold leading-[1.05] tracking-[-0.01em] [text-shadow:0_2px_16px_rgba(0,0,0,0.5)]"
-            style={{ fontSize: "clamp(28px, 3.5vw, 56px)" }}
+    <section className="w-full pb-20 pt-5" data-node-id="200:2508">
+      <Container>
+        <div className="grid grid-cols-12 gap-x-[14px]">
+          {/* col-start-1 → Figma'dagi x=100 (kontent chap cheti, logo bilan bir
+                chiziqda). w-fit → kenglikni 2-satrning o'zi belgilaydi.
+                Bitta <h1>: mazmunan yaxlit gap, screen reader uni uch alohida
+                paragraf emas, bitta sarlavha sifatida o'qiydi. */}
+          <h1
+            className="col-span-12 col-start-1 flex w-fit flex-col justify-self-start text-[40px] uppercase leading-[1.2] text-[#e0caab] max-[439.98px]:text-[36px]"
+            style={{
+              fontFamily: "var(--font-inter-tight), Inter, sans-serif",
+              fontWeight: 500,
+            }}
           >
-            {address.replace("Uzbekistan, ", "")}
-          </span>
-          <span
-            className="font-bold leading-none tracking-[-0.01em] [text-shadow:0_2px_16px_rgba(0,0,0,0.5)]"
-            style={{ fontSize: "clamp(32px, 4vw, 64px)" }}
-          >
-            {phone}
-          </span>
-        </motion.div>
+            {LINES.map(({ text, align }) => (
+              // flex-col'ning `stretch`i tufayli har satr konteyner kengligiga
+              // cho'ziladi — shuning uchun text-align ishlaydi.
+              <span key={text} className={align}>
+                {text}
+              </span>
+            ))}
+          </h1>
+        </div>
 
-        {/* O'ng: description + button */}
-        <motion.div
-          initial={{ opacity: 0, x: 60 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1, ease: OUT_EXPO, delay: 0.35 }}
-          className="flex flex-col items-start gap-[36px] text-white"
-        >
-          <p
-            className="font-medium leading-[1.35] [text-shadow:0_2px_16px_rgba(0,0,0,0.5)]"
-            style={{ fontSize: "clamp(16px, 1.5vw, 24px)", maxWidth: "484px" }}
-          >
-            Gilam do&apos;konimizga xush kelibsiz! Biz har qanday
-            makoningizning shinam atmosferasini yaratamiz.
-          </p>
-
-          {/* Mutaxasis yollash — 220×60 pill (Figma Group 50) */}
-          <button
-            type="button"
-            className="inline-flex h-[60px] items-center gap-[10px] whitespace-nowrap rounded-full border border-white/40 bg-white/95 px-[30px] text-[15px] font-semibold text-black shadow-[0_4px_20px_-4px_rgba(0,0,0,0.35)] backdrop-blur-sm transition-all hover:scale-[1.03] hover:bg-white"
-          >
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M4 11h16v3a5 5 0 01-5 5H9a5 5 0 01-5-5v-3z"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-              <path
-                d="M7 8v-.5M12 8V6M17 8v-.5M4 22h16"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-            </svg>
-            Mutaxasis yollash
-          </button>
-        </motion.div>
-      </div>
+        {/* Title'dan 14px pastdagi blok: chapda description + karusel +
+              arrowlar (col-1→col-2), o'ngda media zonasi (col-3→col-12). */}
+        <HeroShowcase slides={slides} />
+      </Container>
     </section>
   );
 }
