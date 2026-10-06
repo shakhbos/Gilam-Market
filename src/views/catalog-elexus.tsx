@@ -37,7 +37,7 @@ export default async function CatalogElexus({ shop }: Props) {
     <main className="min-h-screen bg-[#F4EFE9]" data-tenant={shop.slug}>
       <Header variant="light" />
       <CatalogToolbar />
-      <CatalogListing collections={collections} />
+      <CatalogListing collections={collections} shopSlug={shop.slug} />
       <PromoBannerSection />
       <Footer />
     </main>

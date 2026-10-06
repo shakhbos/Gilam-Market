@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale } from "next-intl";
 import Image from "next/image";
 
 import Container from "./container";
@@ -21,6 +22,11 @@ import { addElexusCartItem } from "@/lib/features";
 function isVideoUrl(src: string): boolean {
   return /\.(mp4|webm|mov)$/i.test(src);
 }
+
+/** Rang doira tugmalari ustidagi label — elexus komponentlari hozircha
+    next-intl `messages/*.json` orqali emas, shunday qo'lda tarjima qilinadi
+    (qolgan matn ham shu uslubda, qarang "Цена"/"Добавить в корзину"). */
+const COLOR_LABEL: Record<string, string> = { ru: "Цвета", en: "Colors", uz: "Ranglar" };
 
 /*
  * Elexus — Mahsulot (bitta model) sahifasi kontenti. Figma frame 100:803
@@ -88,6 +94,7 @@ export function CatalogProductContext({
   activeImage: string;
   onSelectImage: (src: string) => void;
 }) {
+  const locale = useLocale();
   return (
     <>
       <div className="flex flex-col gap-[7px] uppercase text-black">
@@ -99,7 +106,7 @@ export function CatalogProductContext({
 
       <div className="mt-[20px] flex flex-col gap-[4px] text-[14px] text-[#7E7C78]">
         <p className="uppercase opacity-50">Цена</p>
-        <p>{collection.pricePerSqmFrom}</p>
+        <p>{formatSumElexus(collection.price)} сум</p>
       </div>
 
       {product.gallery.length > 1 && (
@@ -127,23 +134,28 @@ export function CatalogProductContext({
       {/* Rang variantlari — doira tugmalar, bosilganda hero/galereya shu
           rangning default rasmiga almashadi (onSelectImage'ning o'zi). */}
       {product.colors && product.colors.length > 0 && (
-        <div className="mt-[20px] flex flex-wrap items-center gap-[10px]">
-          {product.colors.map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              onClick={() => onSelectImage(c.image)}
-              aria-pressed={c.image === activeImage}
-              title={c.title}
-              className={`relative h-[36px] w-[36px] shrink-0 overflow-hidden rounded-full border transition-all duration-150 ${
-                c.image === activeImage
-                  ? "border-black"
-                  : "border-transparent opacity-70 hover:opacity-100"
-              }`}
-            >
-              <Image src={c.image} alt={c.title} fill sizes="36px" className="object-cover" />
-            </button>
-          ))}
+        <div className="mt-[20px] flex flex-col gap-[8px]">
+          <p className="text-[14px] uppercase text-[#7E7C78] opacity-50">
+            {COLOR_LABEL[locale] ?? COLOR_LABEL.ru}
+          </p>
+          <div className="flex flex-wrap items-center gap-[10px]">
+            {product.colors.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() => onSelectImage(c.image)}
+                aria-pressed={c.image === activeImage}
+                title={c.title}
+                className={`relative h-[36px] w-[36px] shrink-0 overflow-hidden rounded-full border transition-all duration-150 ${
+                  c.image === activeImage
+                    ? "border-black"
+                    : "border-transparent opacity-70 hover:opacity-100"
+                }`}
+              >
+                <Image src={c.image} alt={c.title} fill sizes="36px" className="object-cover" />
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </>

@@ -6,6 +6,8 @@ import { motion } from "motion/react";
 
 import CatalogCollectionRow from "./catalog-collection-row";
 import type { CatalogCollection, CatalogProductVariant } from "@/data/catalog-elexus";
+import { fetchGroupDetail } from "@/service/catalog-public";
+import { enrichWithGroupDetail } from "@/data/catalog-adapter";
 
 /*
  * Elexus — /catalog sahifasining "jonli" qismi — "Single-Page Dynamic
@@ -83,15 +85,45 @@ const CLOSED: Active = { collectionSlug: null, productId: null };
 
 export default function CatalogListing({
   collections,
+  shopSlug,
 }: {
   /** Server'da bir marta tanlangan (tasodifiy) 2 model — har kolleksiya uchun. */
   collections: readonly {
     collection: CatalogCollection;
     preview: readonly CatalogProductVariant[];
   }[];
+  shopSlug: string;
 }) {
   const locale = useLocale();
   const [active, setActive] = useState<Active>(CLOSED);
+
+  // Ro'yxat so'rovi (`fetchCatalogGroups`) galereya/rang/kelib chiqishini
+  // bermaydi (faqat `group-detail` beradi, qarang catalog-public.ts) — shu
+  // sabab accordion ICHIDA mahsulot ochilganda shu yerda CLIENT'da alohida
+  // so'raladi va natija shu state'da keshlanadi (productId bo'yicha, bir marta).
+  const [enriched, setEnriched] = useState<
+    Record<string, { collection: CatalogCollection; product: CatalogProductVariant }>
+  >({});
+
+  useEffect(() => {
+    const productId = active.productId;
+    const collectionSlug = active.collectionSlug;
+    if (!productId || !collectionSlug || enriched[productId]) return;
+    const found = collections.find((c) => c.collection.slug === collectionSlug);
+    const product = found?.collection.products.find((p) => p.id === productId);
+    if (!found || !product) return;
+
+    const [modelId, shapeId] = productId.split(":");
+    let cancelled = false;
+    fetchGroupDetail(shopSlug, found.collection.id, modelId, shapeId).then((detail) => {
+      if (cancelled || !detail) return;
+      const result = enrichWithGroupDetail(found.collection, product, detail);
+      setEnriched((prev) => ({ ...prev, [productId]: result }));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [active.productId, active.collectionSlug, collections, shopSlug, enriched]);
 
   const buildPath = useCallback(
     (collectionSlug: string | null, modelSlug?: string | null) => {
@@ -154,21 +186,30 @@ export default function CatalogListing({
 
   return (
     <motion.div layout className="flex flex-col gap-[100px] pb-[87px]">
-      {orderedCollections.map(({ collection, preview }) => (
-        <CatalogCollectionRow
-          key={collection.id}
-          collection={collection}
-          previewProducts={preview}
-          isActive={active.collectionSlug === collection.slug}
-          activeProductId={active.collectionSlug === collection.slug ? active.productId : null}
-          onToggle={() =>
-            active.collectionSlug === collection.slug
-              ? closeCollection()
-              : openCollection(collection.slug)
-          }
-          onOpenProduct={(p) => openProduct(collection.slug, p)}
-        />
-      ))}
+      {orderedCollections.map(({ collection, preview }) => {
+        const isRowActive = active.collectionSlug === collection.slug;
+        const rowEnriched = isRowActive && active.productId ? enriched[active.productId] : undefined;
+        const effectiveCollection = rowEnriched
+          ? {
+              ...rowEnriched.collection,
+              products: collection.products.map((p) =>
+                p.id === rowEnriched.product.id ? rowEnriched.product : p,
+              ),
+            }
+          : collection;
+
+        return (
+          <CatalogCollectionRow
+            key={collection.id}
+            collection={effectiveCollection}
+            previewProducts={preview}
+            isActive={isRowActive}
+            activeProductId={isRowActive ? active.productId : null}
+            onToggle={() => (isRowActive ? closeCollection() : openCollection(collection.slug))}
+            onOpenProduct={(p) => openProduct(collection.slug, p)}
+          />
+        );
+      })}
     </motion.div>
   );
 }
