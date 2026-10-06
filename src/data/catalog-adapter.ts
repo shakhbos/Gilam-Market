@@ -92,6 +92,10 @@ function buildSpecs(group: ApiCatalogGroup, sizeStrings: string[], price: number
   ];
 }
 
+/** Forma (Rulo/Oval/...) kolleksiya emas — MODEL+shape darajasiga tegishli,
+ * shuning uchun bu ro'yxatda EMAS (CatalogCollection umumiy) — alohida
+ * `product.shapeTitle` sifatida saqlanadi, catalog-product-detail.tsx shu
+ * ro'yxatning ENG BOSHIGA qo'shib ko'rsatadi. */
 function buildDetailSpecs(
   origin: { country: string | null; factory: string | null } | null,
   density: string | null,
@@ -114,13 +118,13 @@ function buildDetailSpecs(
 
 function buildProduct(group: ApiCatalogGroup, collectionTitle: string, index: number): CatalogProductVariant {
   const img = imageUrl(group.imgPath);
-  const modelTitle = group.shapeTitle ? `${group.modelTitle} (${group.shapeTitle})` : group.modelTitle;
   return {
     id: `${group.modelId}:${group.shapeId}`,
     slug: slugify(group.shapeTitle ? `${group.modelTitle}-${group.shapeTitle}` : group.modelTitle),
     sku: `n°${String(index + 1).padStart(4, "0")}`,
-    name: `${collectionTitle} · ${modelTitle}`,
-    modelTitle,
+    name: `${collectionTitle} · ${group.modelTitle}`,
+    modelTitle: group.modelTitle,
+    shapeTitle: group.shapeTitle ?? undefined,
     image: img,
     gallery: img ? [img] : [],
   };
@@ -187,15 +191,24 @@ export function enrichWithGroupDetail(
   product: CatalogProductVariant,
   detail: ApiGroupDetail,
 ): { collection: CatalogCollection; product: CatalogProductVariant } {
-  const gallery = detail.media.length
-    ? detail.media.filter((m) => m.mediaType === "image").map((m) => imageUrl(m.mediaUrl))
-    : product.gallery;
-  const heroImage = detail.colors[0]?.imgPath ? imageUrl(detail.colors[0].imgPath) : product.image;
+  // Galereya — rang default rasmlari + guruh-media (rasm VA video, ARALASH —
+  // isVideoUrl() render paytida ajratadi, catalog-product-detail.tsx).
+  const colorImages = detail.colors.filter((c) => c.imgPath).map((c) => imageUrl(c.imgPath));
+  const mediaUrls = [...detail.media]
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((m) => imageUrl(m.mediaUrl));
+  const gallery = Array.from(new Set([...colorImages, ...mediaUrls].filter(Boolean)));
+  const heroImage = colorImages[0] || product.image;
+
+  const colors = detail.colors
+    .filter((c) => c.imgPath)
+    .map((c) => ({ id: c.id, title: c.title, image: imageUrl(c.imgPath) }));
 
   const enrichedProduct: CatalogProductVariant = {
     ...product,
     image: heroImage || product.image,
     gallery: gallery.length ? gallery : product.gallery,
+    colors: colors.length ? colors : undefined,
   };
 
   const enrichedCollection: CatalogCollection = {

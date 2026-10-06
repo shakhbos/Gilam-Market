@@ -16,6 +16,12 @@ import { formatSumElexus } from "@/utils/format-sum-elexus";
 import { useAppDispatch } from "@/lib/hooks";
 import { addElexusCartItem } from "@/lib/features";
 
+/** `product.gallery`dagi element video bo'lsa `<video>`, bo'lmasa
+ * `next/image` bilan ko'rsatiladi — ikkalasi ham shu bitta ro'yxatda. */
+function isVideoUrl(src: string): boolean {
+  return /\.(mp4|webm|mov)$/i.test(src);
+}
+
 /*
  * Elexus — Mahsulot (bitta model) sahifasi kontenti. Figma frame 100:803
  * (2026-09-30'da qayta tekshirilgan — node ID'lar bo'yicha).
@@ -108,7 +114,34 @@ export function CatalogProductContext({
                 i === 0 ? "w-[29px]" : "w-[64px]"
               } ${src === activeImage ? "opacity-100" : "opacity-50 hover:opacity-80"}`}
             >
-              <Image src={src} alt="" fill sizes="64px" className="object-cover" />
+              {isVideoUrl(src) ? (
+                <video src={src} muted loop playsInline className="h-full w-full object-cover" />
+              ) : (
+                <Image src={src} alt="" fill sizes="64px" className="object-cover" />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Rang variantlari — doira tugmalar, bosilganda hero/galereya shu
+          rangning default rasmiga almashadi (onSelectImage'ning o'zi). */}
+      {product.colors && product.colors.length > 1 && (
+        <div className="mt-[20px] flex flex-wrap items-center gap-[10px]">
+          {product.colors.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => onSelectImage(c.image)}
+              aria-pressed={c.image === activeImage}
+              title={c.title}
+              className={`relative h-[36px] w-[36px] shrink-0 overflow-hidden rounded-full border transition-all duration-150 ${
+                c.image === activeImage
+                  ? "border-black"
+                  : "border-transparent opacity-70 hover:opacity-100"
+              }`}
+            >
+              <Image src={c.image} alt={c.title} fill sizes="36px" className="object-cover" />
             </button>
           ))}
         </div>
@@ -167,16 +200,34 @@ export default function CatalogProductDetail({
       className="relative aspect-[700/900] w-full max-w-[700px] overflow-hidden"
       style={{ viewTransitionName: productImageTransitionName(product.id) }}
     >
-      <Image
-        src={activeImage}
-        alt={product.name}
-        fill
-        sizes="(min-width: 1024px) 36vw, 100vw"
-        className="object-cover"
-        priority
-      />
+      {isVideoUrl(activeImage) ? (
+        <video
+          src={activeImage}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      ) : (
+        <Image
+          src={activeImage}
+          alt={product.name}
+          fill
+          sizes="(min-width: 1024px) 36vw, 100vw"
+          className="object-cover"
+          priority
+        />
+      )}
     </div>
   );
+
+  // Forma (Rulo/Oval/...) — MODEL+shape darajasiga tegishli (kolleksiya
+  // emas), shuning uchun `collection.detailSpecs`da yo'q — shu yerda ro'yxat
+  // BOSHIGA qo'shiladi (product.shapeTitle, catalog-adapter.ts).
+  const allDetailSpecs = product.shapeTitle
+    ? [{ label: "Форма", value: product.shapeTitle }, ...collection.detailSpecs]
+    : collection.detailSpecs;
 
   const specs = (
     <div className="max-w-[562px]">
@@ -195,17 +246,17 @@ export default function CatalogProductDetail({
         <span className="text-[16px] font-semibold">{formatSumElexus(collection.price)} сум</span>
       </button>
 
-      <div className="mt-[47px] flex flex-col gap-[9px] text-[14px] leading-[1.5] text-[#7E7C78]">
+      <div className="mt-[30px] flex flex-col gap-[9px] text-[14px] leading-[1.5] text-[#7E7C78]">
         <p>{collection.description[0]}</p>
         <p>{collection.description[1]}</p>
       </div>
 
-      <dl className="mt-[9px]">
-        {collection.detailSpecs.map((s, i) => (
+      <dl className="mt-[30px]">
+        {allDetailSpecs.map((s, i) => (
           <div
             key={s.label}
-            className={`grid grid-cols-[197px_1fr] py-[12px] text-[14px] ${
-              i < collection.detailSpecs.length - 1 ? "border-b border-[#dcd8d2]" : ""
+            className={`grid grid-cols-[197px_1fr] py-[16px] text-[14px] ${
+              i < allDetailSpecs.length - 1 ? "border-b border-[#dcd8d2]" : ""
             }`}
           >
             <dt className="text-[#7E7C78]">{s.label}</dt>

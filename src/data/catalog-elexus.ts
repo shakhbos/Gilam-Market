@@ -47,14 +47,21 @@ export type CatalogProductVariant = {
    * ko'rsatiladi, kartada takrorlanmaydi.
    */
   modelTitle: string;
+  /** Shakl (Rulo/Oval/...) — bor bo'lsa mahsulot sahifasidagi xarakteristika
+   * ro'yxatining ENG BOSHIDA ko'rsatiladi (catalog-product-detail.tsx). */
+  shapeTitle?: string;
   image: string;
   /**
-   * Mahsulot sahifasidagi rasm galereyasi/karuseli (Figma 100:803, node
-   * 319:2654) — hozircha PLACEHOLDER: shu kolleksiyaning mavjud 2 ta demo
-   * rasmidan tuziladi (haqiqiy backend'da har model o'z rasm/video to'plamiga
-   * ega bo'ladi). Har doim kamida 1 ta element (`image`ning o'zi).
+   * Mahsulot sahifasidagi rasm/video galereyasi/karuseli (Figma 100:803,
+   * node 319:2654). Element video bo'lsa URL `.mp4`/`.webm`/`.mov` bilan
+   * tugaydi (`isVideoUrl()`, catalog-product-detail.tsx) — alohida maydon
+   * emas, shu bitta ro'yxatda ARALASH keladi. Har doim kamida 1 ta element
+   * (`image`ning o'zi).
    */
   gallery: readonly string[];
+  /** Guruhdagi rang variantlari (doira tugmalar) — faqat mahsulot sahifasida
+   * (group-detail'dan) to'ldiriladi, ro'yxat sahifasida yo'q. */
+  colors?: readonly { id: string; title: string; image: string }[];
 };
 
 export type CatalogCollection = {
