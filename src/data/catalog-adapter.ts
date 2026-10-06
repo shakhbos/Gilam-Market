@@ -88,7 +88,7 @@ function buildSpecs(group: ApiCatalogGroup, sizeStrings: string[], price: number
     { label: "Плотность", value: group.density ? `${group.density} узлов/м²` : "—" },
     { label: "Материал", value: materialLabel(group.material) },
     { label: "Размеры", value: sizeStrings.join(" · ") || "—" },
-    { label: "Цена", value: price ? `от ${formatSumElexus(price)} сум` : "—" },
+    { label: "Цена", value: price ? `${formatSumElexus(price)} сум за м²` : "—" },
   ];
 }
 
@@ -151,12 +151,11 @@ export function buildCatalogCollections(groups: ApiCatalogGroup[]): CatalogColle
     }
     const sizes = [...sizeByKey.values()].sort((a, b) => a.x * a.y - b.x * b.y);
     const sizeStrings = sizes.map(formatSize);
+    // "Narx(so'm)" (admin) — bitta m² uchun narx, umumiy narx EMAS (ko'paytirish
+    // kerak emas); umumiy narx tanlangan o'lcham yuzasiga qarab hisoblanadi
+    // (catalog-product-detail.tsx, sizeAreaM2()).
     const price = Number(first.price || 0);
-    const minSize = sizes[0];
-    const pricePerSqmFrom =
-      minSize && minSize.x * minSize.y > 0
-        ? `от ${formatSumElexus(Math.round(price / (minSize.x * minSize.y)))} сум за м2`
-        : "";
+    const pricePerSqmFrom = price ? `${formatSumElexus(price)} сум за м²` : "";
     const totalCount = items.reduce((sum, g) => sum + (g.totalCount || 0), 0);
 
     collections.push({

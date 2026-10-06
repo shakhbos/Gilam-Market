@@ -9,6 +9,7 @@ import {
 } from "@/data/catalog-elexus";
 import { useAppDispatch } from "@/lib/hooks";
 import { addElexusCartItem } from "@/lib/features";
+import { sizeAreaM2 } from "@/utils/size-area";
 
 /*
  * Elexus — Catalog mahsulot katagi. Ro'yxat qatorida (2 model) va kolleksiya
@@ -49,12 +50,15 @@ export default function CatalogProductTile({
 
   function handleQuickAdd(e: React.MouseEvent) {
     e.stopPropagation();
+    const size = collection.sizes[0];
     dispatch(
       addElexusCartItem({
         collectionSlug: collection.slug,
         productId: product.id,
-        size: collection.sizes[0],
-        pricePerUnit: collection.price,
+        size,
+        // `collection.price` — Narx(so'm/м²), umumiy narx EMAS — qarang
+        // catalog-product-detail.tsx'dagi bir xil hisob.
+        pricePerUnit: Math.round(collection.price * sizeAreaM2(size)),
         maxQuantity: collection.maxQuantity,
         quantity: 1,
       }),

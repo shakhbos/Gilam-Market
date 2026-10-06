@@ -14,6 +14,7 @@ import {
   type CatalogProductVariant,
 } from "@/data/catalog-elexus";
 import { formatSumElexus } from "@/utils/format-sum-elexus";
+import { sizeAreaM2 } from "@/utils/size-area";
 import { useAppDispatch } from "@/lib/hooks";
 import { addElexusCartItem } from "@/lib/features";
 
@@ -106,7 +107,7 @@ export function CatalogProductContext({
 
       <div className="mt-[20px] flex flex-col gap-[4px] text-[14px] text-[#7E7C78]">
         <p className="uppercase opacity-50">Цена</p>
-        <p>{formatSumElexus(collection.price)} сум</p>
+        <p>{collection.pricePerSqmFrom}</p>
       </div>
 
       {product.gallery.length > 1 && (
@@ -194,13 +195,18 @@ export default function CatalogProductDetail({
 
   const activeImage = embedded ? embeddedActiveImage ?? product.image : internalActiveImage;
 
+  // `collection.price` — Narx(so'm/м²), umumiy narx EMAS — tanlangan
+  // o'lcham yuzasiga ko'paytiriladi (masalan 200×2500 sm = 50 м², 420 000 ×
+  // 50 = 21 000 000 so'm).
+  const totalPrice = Math.round(collection.price * sizeAreaM2(selectedSize));
+
   function handleAddToCart() {
     dispatch(
       addElexusCartItem({
         collectionSlug: collection.slug,
         productId: product.id,
         size: selectedSize,
-        pricePerUnit: collection.price,
+        pricePerUnit: totalPrice,
         maxQuantity: collection.maxQuantity,
         quantity,
       }),
@@ -255,7 +261,7 @@ export default function CatalogProductDetail({
         style={{ fontFamily: "var(--font-inter-tight), Inter, sans-serif" }}
       >
         <span className="text-[16px] font-semibold uppercase">Добавить в корзину</span>
-        <span className="text-[16px] font-semibold">{formatSumElexus(collection.price)} сум</span>
+        <span className="text-[16px] font-semibold">{formatSumElexus(totalPrice)} сум</span>
       </button>
 
       <div className="mt-[30px] flex flex-col gap-[9px] text-[14px] leading-[1.5] text-[#7E7C78]">
