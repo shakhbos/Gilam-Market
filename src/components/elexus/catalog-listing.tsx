@@ -120,7 +120,7 @@ export default function CatalogListing({
       }
       const product = modelSlug
         ? found.collection.products.find(
-            (p) => p.modelTitle.toLowerCase() === modelSlug.toLowerCase(),
+            (p) => p.slug.toLowerCase() === modelSlug.toLowerCase(),
           )
         : undefined;
       setActive({ collectionSlug, productId: product?.id ?? null });
@@ -141,7 +141,7 @@ export default function CatalogListing({
 
   const openProduct = (collectionSlug: string, product: CatalogProductVariant) => {
     setActive({ collectionSlug, productId: product.id });
-    window.history.pushState(null, "", buildPath(collectionSlug, product.modelTitle.toLowerCase()));
+    window.history.pushState(null, "", buildPath(collectionSlug, product.slug));
   };
 
   const orderedCollections = (() => {

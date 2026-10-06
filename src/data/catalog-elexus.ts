@@ -34,6 +34,8 @@ export type CatalogDetailSpec = { label: string; value: string | readonly string
 
 export type CatalogProductVariant = {
   id: string;
+  /** /catalog/[collection]/[slug] uchun — kolleksiya ichida noyob. */
+  slug: string;
   /** "n°0001" ko'rinishidagi SKU — butun katalogda noyob. */
   sku: string;
   /** To'liq tavsiflovchi nom (rasm `alt`i uchun) — "{Kolleksiya} · {model}". */
@@ -102,24 +104,20 @@ const SPECS: readonly CatalogSpec[] = [
  * bitta xil (Figma'da ham shunday — faqat bitta variant bor edi).
  */
 const DETAIL_SPECS: readonly CatalogDetailSpec[] = [
-  {
-    label: "Примерка дома",
-    value: "Привезём до четырёх ковров и оставим на выходные",
-  },
   { label: "Происхождение", value: "Иран, Тебриз" },
   { label: "Материал", value: "Шерсть корк и шёлк" },
   { label: "Плотность", value: "1 000 000 узлов/м²" },
   { label: "Тип узла", value: "Двойной персидский узел" },
   { label: "Высота ворса", value: "12 мм" },
-  {
-    label: "Размеры",
-    value: ["200×300 6,00 м²", "250×350 8,75 м²", "300×400 12,00 м²"],
-  },
   { label: "Стиль интерьера", value: "Классика, Восточный, Неоклассика" },
   {
     label: "Уход",
     value:
       "Пылесос без турбощётки, поворот на 180° раз в полгода. Профессиональная чистка для клиентов Elexus — бесплатно, раз в год.",
+  },
+  {
+    label: "Примерка дома",
+    value: "Привезём до четырёх ковров и оставим на выходные",
   },
   {
     label: "Доставка",
@@ -134,8 +132,10 @@ const PRICE = 1_910_000;
 /** Barcha kolleksiyalarda bitta xil demo qiymat (Figma: "от 800 000 сум за м2"). */
 const PRICE_PER_SQM_FROM = "от 800 000 сум за м2";
 
-/** `CatalogSizePicker` uchun demo o'lchamlar — `SPECS`/`DETAIL_SPECS`dagi
- * "Размеры" bilan bir xil 3 ta o'lcham, lekin m²siz, alohida tugma sifatida. */
+/** `CatalogSizePicker` uchun demo o'lchamlar — `SPECS`dagi "Размеры" bilan
+ * bir xil 3 ta o'lcham, lekin m²siz, alohida tugma sifatida. `DETAIL_SPECS`da
+ * ENDI "Размеры" qatori YO'Q (2026-10-04 olib tashlandi) — bu picker allaqachon
+ * mahsulot sahifasida ko'rsatilgani uchun pastdagi jadvalda takrorlanmasin. */
 const SIZES: readonly string[] = ["200×300", "250×350", "300×400"];
 
 /** `CatalogQuantityPicker` uchun demo maksimal miqdor (Figma demo: 1-3 шт). */
@@ -157,6 +157,7 @@ function threeModels(
   const images = [imgA, imgB, imgA];
   return modelCodes.map((code, i) => ({
     id: `${idPrefix}-${i + 1}`,
+    slug: code.toLowerCase(),
     sku: `n°${String(skuStart + i).padStart(4, "0")}`,
     name: `${title} · ${code}`,
     modelTitle: code,
@@ -254,13 +255,13 @@ export function getCatalogCollection(
   return CATALOG_COLLECTIONS.find((c) => c.slug === slug);
 }
 
-/** Model kodi bo'yicha (harf katta-kichikligiga qaramay) mahsulotni topadi. */
+/** `product.slug` bo'yicha (harf katta-kichikligiga qaramay) mahsulotni topadi. */
 export function getCatalogProduct(
   collection: CatalogCollection,
   modelSlug: string,
 ): CatalogProductVariant | undefined {
   return collection.products.find(
-    (p) => p.modelTitle.toLowerCase() === modelSlug.toLowerCase(),
+    (p) => p.slug.toLowerCase() === modelSlug.toLowerCase(),
   );
 }
 

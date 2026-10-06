@@ -3,7 +3,9 @@ import CatalogToolbar from "@/components/elexus/catalog-toolbar";
 import CatalogListing from "@/components/elexus/catalog-listing";
 import PromoBannerSection from "@/components/elexus/promo-banner-section";
 import Footer from "@/components/elexus/footer";
-import { CATALOG_COLLECTIONS, pickRandomProducts } from "@/data/catalog-elexus";
+import { buildCatalogCollections } from "@/data/catalog-adapter";
+import { pickRandomProducts } from "@/data/catalog-elexus";
+import { fetchCatalogGroups } from "@/service/catalog-public";
 import type { TenantShop } from "@/service/tenant-shop";
 
 /*
@@ -24,8 +26,9 @@ type Props = {
   shop: TenantShop;
 };
 
-export default function CatalogElexus({ shop }: Props) {
-  const collections = CATALOG_COLLECTIONS.map((collection) => ({
+export default async function CatalogElexus({ shop }: Props) {
+  const groups = await fetchCatalogGroups(shop.slug);
+  const collections = buildCatalogCollections(groups).map((collection) => ({
     collection,
     preview: pickRandomProducts(collection.products, 2),
   }));
