@@ -126,7 +126,7 @@ export function CatalogProductContext({
 
       {/* Rang variantlari — doira tugmalar, bosilganda hero/galereya shu
           rangning default rasmiga almashadi (onSelectImage'ning o'zi). */}
-      {product.colors && product.colors.length > 1 && (
+      {product.colors && product.colors.length > 0 && (
         <div className="mt-[20px] flex flex-wrap items-center gap-[10px]">
           {product.colors.map((c) => (
             <button
