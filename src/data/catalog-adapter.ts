@@ -2,7 +2,13 @@ import { minio_img_url } from "@/utils/divice";
 import { formatSumElexus } from "@/utils/format-sum-elexus";
 import { slugify } from "@/utils/slugify";
 import type { ApiCatalogGroup, ApiGroupDetail } from "@/service/catalog-public";
-import type { CatalogCollection, CatalogDetailSpec, CatalogProductVariant, CatalogSpec } from "./catalog-elexus";
+import type {
+  CatalogCollection,
+  CatalogColorFamily,
+  CatalogDetailSpec,
+  CatalogProductVariant,
+  CatalogSpec,
+} from "./catalog-elexus";
 
 /*
  * Haqiqiy backend javobini (`shop-product/public/catalog*`) mavjud
@@ -199,15 +205,27 @@ export function enrichWithGroupDetail(
   const gallery = Array.from(new Set([...colorImages, ...mediaUrls].filter(Boolean)));
   const heroImage = colorImages[0] || product.image;
 
-  const colors = detail.colors
-    .filter((c) => c.imgPath)
-    .map((c) => ({ id: c.id, title: c.title, image: imageUrl(c.imgPath) }));
+  // Rang-guruh (ColorFamily) bo'yicha guruhlash — familysiz yoki rasmsiz
+  // rang picker'da ko'rsatilmaydi (gallery/hero uchun esa hali ishlatiladi,
+  // yuqorida). Har bir rangning o'z `sizes`i ham shu yerda formatlanadi.
+  const familyMap = new Map<string, CatalogColorFamily & { colors: { id: string; title: string; image: string; sizes: string[] }[] }>();
+  for (const c of detail.colors) {
+    if (!c.imgPath || !c.colorFamilyId) continue;
+    const family = familyMap.get(c.colorFamilyId) ?? {
+      id: c.colorFamilyId,
+      swatch: c.colorFamilySwatch || "#CCCCCC",
+      colors: [],
+    };
+    family.colors.push({ id: c.id, title: c.title, image: imageUrl(c.imgPath), sizes: c.sizes.map(formatSize) });
+    familyMap.set(c.colorFamilyId, family);
+  }
+  const colorFamilies = [...familyMap.values()];
 
   const enrichedProduct: CatalogProductVariant = {
     ...product,
     image: heroImage || product.image,
     gallery: gallery.length ? gallery : product.gallery,
-    colors: colors.length ? colors : undefined,
+    colorFamilies: colorFamilies.length ? colorFamilies : undefined,
   };
 
   const enrichedCollection: CatalogCollection = {

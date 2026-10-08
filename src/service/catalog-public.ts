@@ -38,7 +38,11 @@ export type ApiGroupDetailColor = {
   id: string;
   title: string;
   colorFamilyId: string | null;
+  colorFamilySwatch: string | null;
   imgPath: string | null;
+  /** Shu ANIQ rang uchun aktiv zaxirali o'lchamlar (guruh darajasidagi
+   * `ApiGroupDetail.sizes`dan farqli — faqat shu rangga tegishli). */
+  sizes: ApiCatalogSize[];
 };
 
 export type ApiGroupMedia = {

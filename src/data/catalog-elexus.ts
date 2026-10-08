@@ -59,9 +59,22 @@ export type CatalogProductVariant = {
    * (`image`ning o'zi).
    */
   gallery: readonly string[];
-  /** Guruhdagi rang variantlari (doira tugmalar) — faqat mahsulot sahifasida
-   * (group-detail'dan) to'ldiriladi, ro'yxat sahifasida yo'q. */
-  colors?: readonly { id: string; title: string; image: string }[];
+  /**
+   * Rang-guruh (ColorFamily) picker — 2 daraja: oddiy to'ldirilgan aylana
+   * (matnsiz, `swatch`) orqali guruh tanlanadi, ichidagi `colors` esa O'SHA
+   * guruhga tegishli ANIQ ranglar (haqiqiy mahsulot rasmi bilan). Har bir
+   * rangning o'z `sizes`i bor — tanlanganda "Размеры" shunga almashadi.
+   * Faqat mahsulot sahifasida (group-detail'dan) to'ldiriladi, ro'yxat
+   * sahifasida yo'q (2026-10-08).
+   */
+  colorFamilies?: readonly CatalogColorFamily[];
+};
+
+export type CatalogColorFamily = {
+  id: string;
+  /** Hex yoki CSS `background` qiymati (masalan Multicolor uchun gradient). */
+  swatch: string;
+  colors: readonly { id: string; title: string; image: string; sizes: readonly string[] }[];
 };
 
 export type CatalogCollection = {

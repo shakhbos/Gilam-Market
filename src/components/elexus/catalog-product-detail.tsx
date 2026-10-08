@@ -24,6 +24,18 @@ function isVideoUrl(src: string): boolean {
   return /\.(mp4|webm|mov)$/i.test(src);
 }
 
+/** Aktiv rasm biror ANIQ rangga tegishli bo'lsa — shu rangning o'z
+ * o'lchamlarini qaytaradi ("Размеры" shunga almashishi uchun); aks holda
+ * (hali rang tanlanmagan yoki oddiy galereya rasmi aktiv) `undefined` —
+ * chaqiruvchi `collection.sizes` (umumiy ro'yxat) ga qaytadi. */
+function findSizesForImage(product: CatalogProductVariant, image: string): readonly string[] | undefined {
+  for (const family of product.colorFamilies ?? []) {
+    const match = family.colors.find((c) => c.image === image);
+    if (match) return match.sizes;
+  }
+  return undefined;
+}
+
 /** Rang doira tugmalari ustidagi label — elexus komponentlari hozircha
     next-intl `messages/*.json` orqali emas, shunday qo'lda tarjima qilinadi
     (qolgan matn ham shu uslubda, qarang "Цена"/"Добавить в корзину"). */
@@ -96,6 +108,21 @@ export function CatalogProductContext({
   onSelectImage: (src: string) => void;
 }) {
   const locale = useLocale();
+  // Rang-guruh (ColorFamily) tanlangan/tanlanmagan holati — faqat shu
+  // komponentning o'z UI holati (qaysi guruh "ochiq" ko'rsatilmoqda).
+  // Boshlanishida HECH QAYSI family aktiv emas (mijoz hali tanlamagan —
+  // hero/sizes default/umumiy holatda turadi, qarang CatalogProductDetail
+  // dagi `findSizesForImage`).
+  const [activeFamilyId, setActiveFamilyId] = useState<string | null>(null);
+  const activeFamily = product.colorFamilies?.find((f) => f.id === activeFamilyId);
+
+  function handleSelectFamily(familyId: string) {
+    setActiveFamilyId(familyId);
+    const family = product.colorFamilies?.find((f) => f.id === familyId);
+    const first = family?.colors[0];
+    if (first) onSelectImage(first.image);
+  }
+
   return (
     <>
       <div className="flex flex-col gap-[7px] uppercase text-black">
@@ -132,31 +159,53 @@ export function CatalogProductContext({
         </div>
       )}
 
-      {/* Rang variantlari — doira tugmalar, bosilganda hero/galereya shu
-          rangning default rasmiga almashadi (onSelectImage'ning o'zi). */}
-      {product.colors && product.colors.length > 0 && (
+      {/* 1-daraja — rang-guruh (ColorFamily) badge'lari: oddiy to'ldirilgan
+          aylana (matnsiz), bosilganda shu guruhning 1-rangi avto-tanlanadi
+          (hero + pastdagi 2-daraja ro'yxati shunga almashadi). */}
+      {product.colorFamilies && product.colorFamilies.length > 0 && (
         <div className="mt-[20px] flex flex-col gap-[8px]">
           <p className="text-[14px] uppercase text-[#7E7C78] opacity-50">
             {COLOR_LABEL[locale] ?? COLOR_LABEL.ru}
           </p>
           <div className="flex flex-wrap items-center gap-[10px]">
-            {product.colors.map((c) => (
+            {product.colorFamilies.map((family) => (
               <button
-                key={c.id}
+                key={family.id}
                 type="button"
-                onClick={() => onSelectImage(c.image)}
-                aria-pressed={c.image === activeImage}
-                title={c.title}
-                className={`relative h-[36px] w-[36px] shrink-0 overflow-hidden rounded-full border transition-all duration-150 ${
-                  c.image === activeImage
-                    ? "border-black"
-                    : "border-transparent opacity-70 hover:opacity-100"
+                onClick={() => handleSelectFamily(family.id)}
+                aria-pressed={family.id === activeFamilyId}
+                className={`h-[28px] w-[28px] shrink-0 rounded-full border transition-all duration-150 ${
+                  family.id === activeFamilyId ? "border-black" : "border-transparent opacity-80 hover:opacity-100"
                 }`}
-              >
-                <Image src={c.image} alt={c.title} fill sizes="36px" className="object-cover" />
-              </button>
+                style={{ background: family.swatch }}
+              />
             ))}
           </div>
+
+          {/* 2-daraja — aktiv guruhning ANIQ ranglari (haqiqiy mahsulot
+              rasmi), bosilganda hero shu rangga, "Размеры" shu rangning
+              o'z o'lchamlariga almashadi (CatalogProductDetail, activeImage
+              orqali — qarang findSizesForImage). */}
+          {activeFamily && (
+            <div className="flex flex-wrap items-center gap-[10px]">
+              {activeFamily.colors.map((c) => (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => onSelectImage(c.image)}
+                  aria-pressed={c.image === activeImage}
+                  title={c.title}
+                  className={`relative h-[36px] w-[36px] shrink-0 overflow-hidden rounded-full border transition-all duration-150 ${
+                    c.image === activeImage
+                      ? "border-black"
+                      : "border-transparent opacity-70 hover:opacity-100"
+                  }`}
+                >
+                  <Image src={c.image} alt={c.title} fill sizes="36px" className="object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </>
@@ -194,6 +243,17 @@ export default function CatalogProductDetail({
   }, [product.id, product.image, collection.sizes]);
 
   const activeImage = embedded ? embeddedActiveImage ?? product.image : internalActiveImage;
+
+  // Aktiv rasm biror ANIQ rangga tegishli bo'lsa — "Размеры" shu rangning
+  // o'ZINING aktiv zaxirali o'lchamlariga almashadi; aks holda (hali rang
+  // tanlanmagan) butun guruh bo'yicha umumiy ro'yxat (2026-10-08).
+  const effectiveSizes = findSizesForImage(product, activeImage) ?? collection.sizes;
+  useEffect(() => {
+    if (!effectiveSizes.includes(selectedSize)) {
+      setSelectedSize(effectiveSizes[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [effectiveSizes]);
 
   // `collection.price` — Narx(so'm/м²), umumiy narx EMAS — tanlangan
   // o'lcham yuzasiga ko'paytiriladi (masalan 200×2500 sm = 50 м², 420 000 ×
@@ -250,7 +310,7 @@ export default function CatalogProductDetail({
   const specs = (
     <div className="max-w-[562px]">
       <div className="flex flex-wrap items-start justify-between gap-x-10 gap-y-4">
-        <CatalogSizePicker sizes={collection.sizes} value={selectedSize} onChange={setSelectedSize} />
+        <CatalogSizePicker sizes={effectiveSizes} value={selectedSize} onChange={setSelectedSize} />
         <CatalogQuantityPicker max={collection.maxQuantity} value={quantity} onChange={setQuantity} />
       </div>
 
