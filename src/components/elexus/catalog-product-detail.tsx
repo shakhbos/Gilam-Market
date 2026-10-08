@@ -195,7 +195,7 @@ export function CatalogProductContext({
                   onClick={() => onSelectImage(c.image)}
                   aria-pressed={c.image === activeImage}
                   title={c.title}
-                  className={`relative h-[36px] w-[36px] shrink-0 overflow-hidden rounded-full border transition-all duration-150 ${
+                  className={`relative h-[36px] w-[36px] shrink-0 overflow-hidden border transition-all duration-150 ${
                     c.image === activeImage
                       ? "border-black"
                       : "border-transparent opacity-70 hover:opacity-100"
