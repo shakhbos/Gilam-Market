@@ -36,6 +36,17 @@ export type ElexusCartItem = {
   quantity: number;
   /** ISO sana — shu qator birinchi marta savatga qo'shilgan payt. */
   addedAt: string;
+  /**
+   * Ko'rsatish uchun SNAPSHOT (qo'shilgan paytda saqlanadi, `collectionSlug`
+   * orqali qayta qidirilmaydi) — real backend mahsuloti uchun ham doim
+   * ishlashi uchun (eski bug: demo `catalog-elexus.ts` massividan
+   * qidirilganda haqiqiy mahsulot slug'i topilmay qator yo'qolib qolardi).
+   */
+  title: string;
+  image: string;
+  imageAlt: string;
+  /** Материал / Плотность+ворс / Происхождение — qarang `buildElexusCartSpecDetails`. */
+  specDetails: string[];
 };
 
 type ElexusCartState = {
@@ -86,6 +97,10 @@ export type AddElexusCartItemPayload = {
   pricePerUnit: number;
   maxQuantity: number;
   quantity: number;
+  title: string;
+  image: string;
+  imageAlt: string;
+  specDetails: string[];
 };
 
 const elexusCartSlice = createSlice({

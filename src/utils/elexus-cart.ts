@@ -1,6 +1,30 @@
+import type { CatalogCollection } from "@/data/catalog-elexus";
+
 /**
  * Elexus — savat sahifasi uchun hisob-kitob yordamchilari (Figma 100:931).
  */
+
+/** Collection'ning `detailSpecs`idan bitta matnli qiymatni topadi (massiv bo'lsa "" qaytaradi). */
+function specValue(collection: CatalogCollection, label: string): string {
+  const entry = collection.detailSpecs.find((s) => s.label === label);
+  return typeof entry?.value === "string" ? entry.value : "";
+}
+
+/**
+ * Savat qatorida ko'rsatiladigan 3 ta kolleksiya-darajasidagi spec qatori
+ * (Материал / Плотность+ворс / Происхождение) — `addElexusCartItem`
+ * dispatch qilinganda SNAPSHOT qilinadi (`ElexusCartItem.specDetails`),
+ * keyinchalik `collectionSlug` orqali qayta qidirilmaydi — real backend
+ * mahsuloti qo'shilganda ham doim ishlaydi (demo `catalog-elexus.ts`
+ * massividan mustaqil).
+ */
+export function buildElexusCartSpecDetails(collection: CatalogCollection): string[] {
+  return [
+    specValue(collection, "Материал"),
+    `${specValue(collection, "Плотность")} · ворс ${specValue(collection, "Высота ворса")}`,
+    specValue(collection, "Происхождение"),
+  ];
+}
 
 /** "250×350" (sm) dan maydonni m²da hisoblaydi — "250×350" → 8.75. */
 export function parseSizeAreaSqm(size: string): number {

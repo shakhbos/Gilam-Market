@@ -15,6 +15,7 @@ import {
 } from "@/data/catalog-elexus";
 import { formatSumElexus } from "@/utils/format-sum-elexus";
 import { sizeAreaM2 } from "@/utils/size-area";
+import { buildElexusCartSpecDetails } from "@/utils/elexus-cart";
 import { useAppDispatch } from "@/lib/hooks";
 import { addElexusCartItem } from "@/lib/features";
 
@@ -269,6 +270,10 @@ export default function CatalogProductDetail({
         pricePerUnit: totalPrice,
         maxQuantity: collection.maxQuantity,
         quantity,
+        title: product.modelTitle,
+        image: product.image,
+        imageAlt: product.name,
+        specDetails: buildElexusCartSpecDetails(collection),
       }),
     );
   }

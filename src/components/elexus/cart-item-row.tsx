@@ -4,7 +4,6 @@ import Image from "next/image";
 import { X } from "lucide-react";
 
 import CartQuantityStepper from "./cart-quantity-stepper";
-import { getCatalogCollection, type CatalogCollection } from "@/data/catalog-elexus";
 import { formatSumElexus } from "@/utils/format-sum-elexus";
 import { parseSizeAreaSqm, formatAreaSqm } from "@/utils/elexus-cart";
 import { useAppDispatch } from "@/lib/hooks";
@@ -14,18 +13,14 @@ import {
   type ElexusCartItem,
 } from "@/lib/features/cart-elexus/cart-elexus-slice";
 
-/** Collection'ning `detailSpecs`idan bitta matnli qiymatni topadi. */
-function specValue(collection: CatalogCollection, label: string): string {
-  const entry = collection.detailSpecs.find((s) => s.label === label);
-  return typeof entry?.value === "string" ? entry.value : "";
-}
-
 /*
  * Elexus — savat qatori. Figma 100:979-1004 (har qator 400px baland,
  * pastki chiziq #dcd8d2, birinchi qatorda ustki chiziq ham bor).
- * Spec qatorlari (o'lcham/material/zichlik/kelib chiqishi) saqlanmaydi —
- * `collectionSlug`+`productId` orqali `catalog-elexus.ts`dan render
- * vaqtida qayta olinadi (CartItem — faqat tanlov+narx snapshot).
+ * Sarlavha/rasm/spec `item`ning o'zida SNAPSHOT qilingan (qo'shilgan
+ * paytda saqlangan — qarang `cart-elexus-slice.ts`) — ILGARI
+ * `collectionSlug`+`productId` orqali `catalog-elexus.ts`dan qayta
+ * qidirilardi, bu haqiqiy (demo bo'lmagan) backend mahsuloti uchun
+ * mos kelmay qatorni jimgina yo'qotib qo'yardigan bug edi.
  */
 export default function CartItemRow({
   item,
@@ -35,16 +30,11 @@ export default function CartItemRow({
   index: number;
 }) {
   const dispatch = useAppDispatch();
-  const collection = getCatalogCollection(item.collectionSlug);
-  const product = collection?.products.find((p) => p.id === item.productId);
-  if (!collection || !product) return null;
 
   const area = parseSizeAreaSqm(item.size);
   const specLines = [
     `${item.size} см · ${formatAreaSqm(area)} м²`,
-    specValue(collection, "Материал"),
-    `${specValue(collection, "Плотность")} · ворс ${specValue(collection, "Высота ворса")}`,
-    specValue(collection, "Происхождение"),
+    ...item.specDetails,
   ];
 
   return (
@@ -55,8 +45,8 @@ export default function CartItemRow({
 
       <div className="relative col-span-4 aspect-[273/357] w-full overflow-hidden lg:col-span-2 lg:col-start-2">
         <Image
-          src={product.image}
-          alt={product.name}
+          src={item.image}
+          alt={item.imageAlt}
           fill
           sizes="(min-width: 1024px) 273px, 30vw"
           className="object-cover"
@@ -65,7 +55,7 @@ export default function CartItemRow({
 
       <div className="col-span-6 lg:col-span-2 lg:col-start-4">
         <p className="text-[22px] leading-[1.5] tracking-[-0.242px] text-black">
-          {product.modelTitle}
+          {item.title}
         </p>
         <div className="mt-[5px] flex flex-col text-[14px] leading-[21px] text-[#7E7C78]">
           {specLines.map((line) => (
