@@ -1,6 +1,28 @@
 # MEMORY — Elexus (Gilam-Market)
 
-_Oxirgi yangilanish: 2026-10-01. Bu fayl loyiha holatini chat'lar orasida saqlash uchun — har safar katta ish tugagach yangilanadi._
+_Oxirgi yangilanish: 2026-10-24. Bu fayl loyiha holatini chat'lar orasida saqlash uchun — har safar katta ish tugagach yangilanadi._
+
+## 9) "Заявка" haqiqiy backend'ga ulandi + savat endi aniq rang bilan ishlaydi (2026-10-24)
+
+Bu ish `~/Desktop/Project/Real-Grm/I-MANAGER.md`dagi I_MANAGER/OPERATOR konsolidatsiyasi (P1/P2) doirasida qilindi — asosiy tafsil o'sha faylda, bu yerda faqat Gilam-Market'ga tegishli qismi.
+
+- **Topilgan chuqur bug**: savat qatorlari hech qachon haqiqiy `QrBase.id` olib yurmagan edi (`catalog-adapter.ts`da `product.id = modelId:shapeId` — sun'iy, model+shape darajasida, rang/o'lchamga bog'liq emas) va **rang umuman kuzatilmagan edi** (faqat hero rasm almashardi, qaysi rang ekani hech qayerda saqlanmasdi). To'g'ridan-to'g'ri ulansa, mijoz tanlagan rangdan farqli mahsulot bilan order yaratilardi.
+- **Backend tomoni** (Real-Grm-Back, alohida commit): `shop-product.service.ts::findGroupDetailPublic()`dagi `colorSizes` so'roviga `f.id AS "qrBaseId"` qo'shildi — endi har (rang,o'lcham) juftligi uchun ANIQ `QrBase.id` qaytadi.
+- **Shu repo tomoni**:
+  - `catalog-public.ts`: `ApiCatalogSize`ga ixtiyoriy `qrBaseId` qo'shildi.
+  - `catalog-elexus.ts`/`catalog-adapter.ts`: `CatalogColorFamily.colors[].sizes` endi `string[]` EMAS, `{label, qrBaseId}[]`.
+  - `catalog-product-detail.tsx`: eski `findSizesForImage` → `findColorForImage`ga almashtirildi (endi butun rang obyektini qaytaradi, sizes ichida). `activeImage`dan (default = birinchi rang — mijoz hali bosmagan bo'lsa ham, chunki hero shu rangning rasmi) `selectedQrBaseId` chiqariladi, `handleAddToCart`ga uzatiladi.
+  - `cart-elexus-slice.ts`: `ElexusCartItem`/`AddElexusCartItemPayload`ga `qrBaseId?: string` qo'shildi.
+  - **Chetga chiqarilgan edge-case**: `catalog-product-tile.tsx`dagi ro'yxat-darajasidagi "tezkor qo'shish" (rang tanlamasdan, `collection.sizes[0]`) hamon `qrBaseId`siz savatga tushadi — bu fayl ATAYLAB o'zgartirilmadi. O'rniga `cart-order-modal.tsx`da submit paytida HAR BIR qatorda `qrBaseId` bor-yo'qligi tekshiriladi; yo'q bo'lsa submit BLOKLANADI, foydalanuvchiga "mahsulot sahifasiga qaytib qayta tanlang" xabari chiqadi. Noto'g'ri order yaratishdan ko'ra shu afzal deb qaror qilindi.
+  - Yangi `src/service/client-orders.ts` — `submitGuestClientOrder()`, `POST /client-orders`ga `X-Shop-Host: window.location.hostname` header bilan (slug HECH QAYERDA hardcode qilinmagan — `tenant-shop.ts`dagi server-side mantiqning client-side versiyasi, shuning uchun bu kod Elexus'dan tashqari kelajakda ulanadigan boshqa har qanday tenant uchun ham o'zgarishsiz ishlaydi).
+  - `cart-order-modal.tsx::handleSubmit` — avval SOF UI-MOCK edi (hech qanday fetch, faqat savatni tozalab "yuborildi" ko'rsatardi). Endi haqiqiy `submitGuestClientOrder()` chaqiradi, `submitting`/`errorMsg` state'lari bilan; muvaffaqiyatli bo'lsagina savat tozalanadi, xato bo'lsa savat saqlanadi va xabar ko'rsatiladi.
+- **Natija**: Elexus saytida "Заявка" endi chindan `ClientOrder` yaratadi (`guestName`/`guestPhone` bilan) — zanjir uchidan-uchiga ishlaydi: mijoz → ClientOrder → admin panelda operator "Mijozni tasdiqlang"dan o'tadi → Kassaga o'tkazadi.
+- **Hali TEKSHIRILMAGAN**: bu o'zgarish production'ga deploy qilingandan keyin haqiqiy brauzerda (https://elexus.uz) sinab ko'rilmagan — rang tanlab/tanlamasdan savatga qo'shish, "Заявка" yuborish, admin panelda ko'rinishini. Keyingi sessiya shundan boshlashi kerak.
+- `tsc --noEmit` toza.
+
+## 8) PRODUKSIYAGA DEPLOY QILINDI (2026-10-02)
+
+Pastdagi barcha band (1-7) — to'plangan katta ish (bosh sahifa 9 seksiya, katalog accordion, savat) — commit `5ae0f63` bilan `main`ga push qilindi, GitHub Actions avtomatik deploy qildi. Tasdiqlandi: `https://gilam-market.uz` → `/ru`ga redirect, HTTP 200, "Корзина" matni bilan — JONLI. Hali DEMO ma'lumotdan ishlaydi (`src/data/catalog-elexus.ts`), real `ShopProduct` backend'ga ulanishi hali yo'q (reja tuzilgan, lekin boshlanmagan — tafsil: `~/Desktop/Project/Real-Grm/MEMORY.md` va `OPERATOR-ROADMAP.md` 3-bosqich). ~~"Заявка" submit ham hali faqat savatni tozalaydi, backend'ga bormaydi.~~ — **ESKIRDI, 9-bandda tuzatildi (2026-10-24).**
 
 ## Current Status
 
