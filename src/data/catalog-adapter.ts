@@ -208,7 +208,7 @@ export function enrichWithGroupDetail(
   // Rang-guruh (ColorFamily) bo'yicha guruhlash — familysiz yoki rasmsiz
   // rang picker'da ko'rsatilmaydi (gallery/hero uchun esa hali ishlatiladi,
   // yuqorida). Har bir rangning o'z `sizes`i ham shu yerda formatlanadi.
-  const familyMap = new Map<string, CatalogColorFamily & { colors: { id: string; title: string; image: string; sizes: string[] }[] }>();
+  const familyMap = new Map<string, CatalogColorFamily>();
   for (const c of detail.colors) {
     if (!c.imgPath || !c.colorFamilyId) continue;
     const family = familyMap.get(c.colorFamilyId) ?? {
@@ -216,7 +216,14 @@ export function enrichWithGroupDetail(
       swatch: c.colorFamilySwatch || "#CCCCCC",
       colors: [],
     };
-    family.colors.push({ id: c.id, title: c.title, image: imageUrl(c.imgPath), sizes: c.sizes.map(formatSize) });
+    (family.colors as { id: string; title: string; image: string; sizes: { label: string; qrBaseId: string }[] }[]).push({
+      id: c.id,
+      title: c.title,
+      image: imageUrl(c.imgPath),
+      sizes: c.sizes
+        .filter((s) => s.qrBaseId)
+        .map((s) => ({ label: formatSize(s), qrBaseId: s.qrBaseId as string })),
+    });
     familyMap.set(c.colorFamilyId, family);
   }
   const colorFamilies = [...familyMap.values()];

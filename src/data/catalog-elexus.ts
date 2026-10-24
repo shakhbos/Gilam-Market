@@ -74,7 +74,14 @@ export type CatalogColorFamily = {
   id: string;
   /** Hex yoki CSS `background` qiymati (masalan Multicolor uchun gradient). */
   swatch: string;
-  colors: readonly { id: string; title: string; image: string; sizes: readonly string[] }[];
+  colors: readonly {
+    id: string;
+    title: string;
+    image: string;
+    /** `qrBaseId` — aynan shu (rang, o'lcham) juftligiga mos haqiqiy QrBase.id,
+     * savatga qo'shishda buyurtma item'i uchun ishlatiladi. */
+    sizes: readonly { label: string; qrBaseId: string }[];
+  }[];
 };
 
 export type CatalogCollection = {

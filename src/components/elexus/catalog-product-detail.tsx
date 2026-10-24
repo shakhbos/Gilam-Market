@@ -25,14 +25,18 @@ function isVideoUrl(src: string): boolean {
   return /\.(mp4|webm|mov)$/i.test(src);
 }
 
-/** Aktiv rasm biror ANIQ rangga tegishli bo'lsa — shu rangning o'z
- * o'lchamlarini qaytaradi ("Размеры" shunga almashishi uchun); aks holda
- * (hali rang tanlanmagan yoki oddiy galereya rasmi aktiv) `undefined` —
- * chaqiruvchi `collection.sizes` (umumiy ro'yxat) ga qaytadi. */
-function findSizesForImage(product: CatalogProductVariant, image: string): readonly string[] | undefined {
+/** Aktiv rasm biror ANIQ rangga tegishli bo'lsa — shu rangning o'zini
+ * (o'lchamlari + har o'lchamga mos haqiqiy `qrBaseId` bilan) qaytaradi; aks
+ * holda (hali rang tanlanmagan yoki oddiy galereya rasmi aktiv) `undefined` —
+ * chaqiruvchi `collection.sizes` (umumiy, rangga bog'liq bo'lmagan ro'yxat)
+ * ga qaytadi — bu holda `qrBaseId` aniqlanmaydi (qarang handleAddToCart). */
+function findColorForImage(
+  product: CatalogProductVariant,
+  image: string,
+): { sizes: readonly { label: string; qrBaseId: string }[] } | undefined {
   for (const family of product.colorFamilies ?? []) {
     const match = family.colors.find((c) => c.image === image);
-    if (match) return match.sizes;
+    if (match) return match;
   }
   return undefined;
 }
@@ -248,7 +252,12 @@ export default function CatalogProductDetail({
   // Aktiv rasm biror ANIQ rangga tegishli bo'lsa — "Размеры" shu rangning
   // o'ZINING aktiv zaxirali o'lchamlariga almashadi; aks holda (hali rang
   // tanlanmagan) butun guruh bo'yicha umumiy ro'yxat (2026-10-08).
-  const effectiveSizes = findSizesForImage(product, activeImage) ?? collection.sizes;
+  const activeColor = findColorForImage(product, activeImage);
+  const effectiveSizes = (activeColor?.sizes.map((s) => s.label) ?? collection.sizes) as readonly string[];
+  // Savatga qo'shishda kerak bo'ladigan haqiqiy QrBase.id — faqat rang
+  // aniqlangan bo'lsa mavjud (odatdagi holat, chunki birinchi rang default
+  // aktiv — qarang yuqoridagi internalActiveImage boshlang'ich qiymati).
+  const selectedQrBaseId = activeColor?.sizes.find((s) => s.label === selectedSize)?.qrBaseId;
   useEffect(() => {
     if (!effectiveSizes.includes(selectedSize)) {
       setSelectedSize(effectiveSizes[0]);
@@ -267,6 +276,7 @@ export default function CatalogProductDetail({
         collectionSlug: collection.slug,
         productId: product.id,
         size: selectedSize,
+        qrBaseId: selectedQrBaseId,
         pricePerUnit: totalPrice,
         maxQuantity: collection.maxQuantity,
         quantity,

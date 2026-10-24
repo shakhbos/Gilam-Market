@@ -11,7 +11,14 @@ import { fetchData } from "./get";
 const API_BASE = process.env.NEXT_PUBLIC_URL || "https://api.gilam-market.uz/api";
 
 export type ApiCatalogColor = { id: string; title: string };
-export type ApiCatalogSize = { id: string; x: number | string; y: number | string };
+export type ApiCatalogSize = {
+  id: string;
+  x: number | string;
+  y: number | string;
+  /** Faqat rang-darajasidagi `ApiGroupDetailColor.sizes`da bor — aynan shu
+   * (rang, o'lcham) juftligiga mos haqiqiy `QrBase.id` (buyurtma uchun kerak). */
+  qrBaseId?: string;
+};
 
 export type ApiCatalogGroup = {
   collectionTitle: string;

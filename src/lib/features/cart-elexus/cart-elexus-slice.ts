@@ -31,6 +31,11 @@ export type ElexusCartItem = {
   collectionSlug: string;
   productId: string;
   size: string;
+  /** Aynan tanlangan rang+o'lchamga mos haqiqiy QrBase.id — buyurtma
+   * yuborishda ishlatiladi. Rang hali aniqlanmagan (juda kam uchraydigan)
+   * holatda `undefined` bo'lishi mumkin — shunday qatorlar buyurtmaga
+   * kiritilmaydi (qarang cart-order-modal.tsx). */
+  qrBaseId?: string;
   pricePerUnit: number;
   maxQuantity: number;
   quantity: number;
@@ -94,6 +99,7 @@ export type AddElexusCartItemPayload = {
   collectionSlug: string;
   productId: string;
   size: string;
+  qrBaseId?: string;
   pricePerUnit: number;
   maxQuantity: number;
   quantity: number;
@@ -113,6 +119,7 @@ const elexusCartSlice = createSlice({
       const existing = state.items.find((item) => item.id === id);
       if (existing) {
         existing.quantity = Math.min(existing.maxQuantity, existing.quantity + quantity);
+        existing.qrBaseId = rest.qrBaseId ?? existing.qrBaseId;
       } else {
         state.items.push({ id, ...rest, quantity, addedAt: new Date().toISOString() });
       }

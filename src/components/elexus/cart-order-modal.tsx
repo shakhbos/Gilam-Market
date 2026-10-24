@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { clearElexusCart } from "@/lib/features/cart-elexus/cart-elexus-slice";
 import { formatSumElexus } from "@/utils/format-sum-elexus";
 import { formatUzPhone } from "@/lib/formatUzPhone";
+import { submitGuestClientOrder } from "@/service/client-orders";
 
 const PAYMENT_OPTIONS = [
   { key: "cash", label: "Наличными при получении" },
@@ -16,11 +17,9 @@ type PaymentKey = (typeof PAYMENT_OPTIONS)[number]["key"];
 
 /*
  * Elexus — savat sahifasidagi "Заявка" (buyurtmani tasdiqlash) modali.
- * Figma 100:1021 ("// ЗАЯВКА" overlay) asosida qurilgan. Backend order
- * API'si HALI YO'Q (qarang Gilam-Market/MEMORY.md "Keyingi navbatdagi
- * nomzodlar") — submit qilinganda shu yerda hali fetch chaqiruvi yo'q,
- * faqat savat tozalanadi va modal ichida qisqa tasdiqlash holatiga
- * almashadi. Backend API kelganda `handleSubmit` ichiga ulanadi.
+ * Figma 100:1021 ("// ЗАЯВКА" overlay) asosida qurilgan. `handleSubmit`
+ * `POST /client-orders`ga (mehmon yo'li, `guestName`/`guestPhone`) ulangan —
+ * qarang Real-Grm/I-MANAGER.md 2026-10-23, P1/P2.
  */
 export default function CartOrderModal({ onClose }: { onClose: () => void }) {
   const dispatch = useAppDispatch();
@@ -33,6 +32,8 @@ export default function CartOrderModal({ onClose }: { onClose: () => void }) {
   const [payment, setPayment] = useState<PaymentKey>("cash");
   const [comment, setComment] = useState("");
   const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -50,10 +51,40 @@ export default function CartOrderModal({ onClose }: { onClose: () => void }) {
   const canSubmit =
     name.trim() !== "" && phone.replace(/\D/g, "").length === 12 && address.trim() !== "";
 
-  const handleSubmit = () => {
-    if (!canSubmit) return;
-    dispatch(clearElexusCart());
-    setSent(true);
+  const handleSubmit = async () => {
+    if (!canSubmit || submitting) return;
+
+    // `catalog-product-tile.tsx`dagi "tezkor qo'shish" rang tanlamasdan
+    // ishlaydi — shu qatorlar uchun haqiqiy QrBase.id aniqlanmagan bo'ladi.
+    if (items.some((item) => !item.qrBaseId)) {
+      setErrorMsg(
+        "Savatdagi bir yoki bir nechta mahsulot uchun rang/o'lcham aniq emas — mahsulot sahifasiga qaytib qayta tanlang.",
+      );
+      return;
+    }
+
+    setSubmitting(true);
+    setErrorMsg(null);
+    try {
+      const paymentLabel = PAYMENT_OPTIONS.find((o) => o.key === payment)?.label;
+      await submitGuestClientOrder({
+        client_order_items: items.map((item) => ({
+          product: item.qrBaseId as string,
+          count: item.quantity,
+        })),
+        guestName: name.trim(),
+        guestPhone: phone,
+        full_address: address.trim(),
+        delivery_comment: [paymentLabel, comment.trim()].filter(Boolean).join(" — ") || undefined,
+        payment_type: "IN_HAND",
+      });
+      dispatch(clearElexusCart());
+      setSent(true);
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Buyurtma yuborishda xatolik");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -163,15 +194,22 @@ export default function CartOrderModal({ onClose }: { onClose: () => void }) {
               />
             </label>
 
+            {errorMsg && (
+              <p className="mt-[16px] text-[14px] text-[#FDA29B]">{errorMsg}</p>
+            )}
+
             <button
               type="button"
               onClick={handleSubmit}
-              aria-disabled={!canSubmit}
+              disabled={submitting}
+              aria-disabled={!canSubmit || submitting}
               className={`mt-[32px] flex h-[90px] w-full items-center justify-between px-[33px] text-white transition-opacity duration-150 sm:mt-[40px] ${
-                canSubmit ? "bg-black hover:opacity-90" : "cursor-not-allowed bg-black/40"
+                canSubmit && !submitting ? "bg-black hover:opacity-90" : "cursor-not-allowed bg-black/40"
               }`}
             >
-              <span className="text-[16px] font-semibold uppercase">Отправить заявку</span>
+              <span className="text-[16px] font-semibold uppercase">
+                {submitting ? "Отправка..." : "Отправить заявку"}
+              </span>
               <span className="text-[16px] font-semibold">{formatSumElexus(total)} сум</span>
             </button>
           </>
