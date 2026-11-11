@@ -161,7 +161,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
           </StoreProvider>
         </NextIntlClientProvider>
         <Suspense>
-          <Metrika />
+          {/* Hisoblagich — do'kon (tenant) bo'yicha; asosiy gilam-market.uz uchun — env */}
+          <Metrika counterId={shop?.analytics?.yandexMetrikaId ?? process.env.NEXT_PUBLIC_METRIKA_ID ?? null} />
         </Suspense>
       </body>
     </html>

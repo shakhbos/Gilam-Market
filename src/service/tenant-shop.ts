@@ -32,6 +32,8 @@ export type TenantShop = {
   instagramUrl: string | null;
   facebookUrl: string | null;
   telegramChannelUrl: string | null;
+  /** Backend faqat qat'iy formatdagi ID'larni qaytaradi */
+  analytics?: { yandexMetrikaId: string | null; ga4Id: string | null };
 };
 
 const API_BASE =

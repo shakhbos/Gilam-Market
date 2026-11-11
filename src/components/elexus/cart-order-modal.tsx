@@ -8,6 +8,7 @@ import { clearElexusCart } from "@/lib/features/cart-elexus/cart-elexus-slice";
 import { formatSumElexus } from "@/utils/format-sum-elexus";
 import { formatUzPhone } from "@/lib/formatUzPhone";
 import { submitGuestClientOrder } from "@/service/client-orders";
+import { METRIKA_GOALS, reachGoal } from "@/components/Metrika";
 
 const PAYMENT_OPTIONS = [
   { key: "cash", label: "Наличными при получении" },
@@ -78,6 +79,7 @@ export default function CartOrderModal({ onClose }: { onClose: () => void }) {
         delivery_comment: [paymentLabel, comment.trim()].filter(Boolean).join(" — ") || undefined,
         payment_type: "IN_HAND",
       });
+      reachGoal(METRIKA_GOALS.orderSent);
       dispatch(clearElexusCart());
       setSent(true);
     } catch (err) {
