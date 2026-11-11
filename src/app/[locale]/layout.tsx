@@ -27,8 +27,8 @@ const interTight = Inter_Tight({
 
 /** Asosiy gilam-market.uz sayti (tenant emas) — Yandex Metrica hisoblagichi. */
 const GILAM_MARKET_METRIKA_ID = "114193355";
-/** Asosiy sayt — GA4 Measurement ID (G-...). Hali yaratilmagan. */
-const GILAM_MARKET_GA4_ID: string | null = null;
+/** Asosiy gilam-market.uz sayti (tenant emas) — GA4 Measurement ID. */
+const GILAM_MARKET_GA4_ID = "G-0HJSZE4J65";
 
 // Fallback ranglar — tenant shop primary/secondary ranglar yo'q bo'lsa
 const DEFAULT_PRIMARY = "#2299DD";
