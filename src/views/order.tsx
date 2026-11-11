@@ -11,6 +11,7 @@ import SelectCostom from "@/components/form/select";
 import { DatePicker, TimePicker } from "antd";
 import { toast } from "react-toastify";
 import OrderModal from "@/components/order-modal";
+import { METRIKA_GOALS, reachGoal } from "@/components/Metrika";
 import { changeBuskets } from "@/lib/features";
 import LocationModal from "@/components/LocationModal";
 
@@ -94,6 +95,7 @@ export default function OrderPage() {
 
       const data = await res.json();
       if (data) {
+        reachGoal(METRIKA_GOALS.orderSent);
         setOpenMadal(true)
         dispatch(
           changeBuskets([])

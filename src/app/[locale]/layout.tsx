@@ -24,6 +24,9 @@ const interTight = Inter_Tight({
   variable: '--font-inter-tight',
 });
 
+/** Asosiy gilam-market.uz sayti (tenant emas) — Yandex Metrica hisoblagichi. */
+const GILAM_MARKET_METRIKA_ID = "114193355";
+
 // Fallback ranglar — tenant shop primary/secondary ranglar yo'q bo'lsa
 const DEFAULT_PRIMARY = "#2299DD";
 const DEFAULT_SECONDARY = "#F97316";
@@ -161,8 +164,9 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
           </StoreProvider>
         </NextIntlClientProvider>
         <Suspense>
-          {/* Hisoblagich — do'kon (tenant) bo'yicha; asosiy gilam-market.uz uchun — env */}
-          <Metrika counterId={shop?.analytics?.yandexMetrikaId ?? process.env.NEXT_PUBLIC_METRIKA_ID ?? null} />
+          {/* Hisoblagich — do'kon (tenant) bo'yicha. Do'konsiz (gilam-market.uz) — Gilam Market'niki.
+              Boshqa tenant'da ID bo'lmasa — hech narsa (Gilam Market statistikasi aralashmasin). */}
+          <Metrika counterId={shop ? shop.analytics?.yandexMetrikaId : GILAM_MARKET_METRIKA_ID} />
         </Suspense>
       </body>
     </html>
