@@ -11,6 +11,7 @@ import { Metadata } from 'next';
 import { SITE_URL } from '../../utils/seo';
 import { Inter, Inter_Tight } from 'next/font/google';
 import { Suspense } from "react";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import Metrika from "@/components/Metrika";
 import type { LayoutProps, MetadataProps } from '@/types/next';
 import { getTenantShop } from "../../service/tenant-shop";
@@ -26,6 +27,8 @@ const interTight = Inter_Tight({
 
 /** Asosiy gilam-market.uz sayti (tenant emas) — Yandex Metrica hisoblagichi. */
 const GILAM_MARKET_METRIKA_ID = "114193355";
+/** Asosiy sayt — GA4 Measurement ID (G-...). Hali yaratilmagan. */
+const GILAM_MARKET_GA4_ID: string | null = null;
 
 // Fallback ranglar — tenant shop primary/secondary ranglar yo'q bo'lsa
 const DEFAULT_PRIMARY = "#2299DD";
@@ -167,6 +170,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
           {/* Hisoblagich — do'kon (tenant) bo'yicha. Do'konsiz (gilam-market.uz) — Gilam Market'niki.
               Boshqa tenant'da ID bo'lmasa — hech narsa (Gilam Market statistikasi aralashmasin). */}
           <Metrika counterId={shop ? shop.analytics?.yandexMetrikaId : GILAM_MARKET_METRIKA_ID} />
+          <GoogleAnalytics measurementId={shop ? shop.analytics?.ga4Id : GILAM_MARKET_GA4_ID} />
         </Suspense>
       </body>
     </html>

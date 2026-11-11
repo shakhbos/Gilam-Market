@@ -4,6 +4,8 @@ import { useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
 
+import { GA4_LEAD_EVENT, gaEvent } from "./GoogleAnalytics";
+
 declare global {
   interface Window {
     ym?: (id: number, method: string, ...args: unknown[]) => void;
@@ -17,12 +19,14 @@ export const METRIKA_GOALS = {
   orderSent: "zayavka",
 } as const;
 
+/** Maqsad — Metrica'ga va (bo'lsa) GA4'ga birga yuboriladi. */
 export function reachGoal(goal: string) {
   try {
     if (window.ym && window.__metrikaId) window.ym(window.__metrikaId, "reachGoal", goal);
   } catch {
     // analitika hech qachon sayt ishini buzmasin
   }
+  if (goal === METRIKA_GOALS.orderSent) gaEvent(GA4_LEAD_EVENT);
 }
 
 /**
