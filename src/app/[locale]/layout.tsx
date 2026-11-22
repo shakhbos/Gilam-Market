@@ -15,6 +15,7 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 import Metrika from "@/components/Metrika";
 import type { LayoutProps, MetadataProps } from '@/types/next';
 import { getTenantShop } from "../../service/tenant-shop";
+import LegalRequisites from "@/components/legal-requisites";
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 // Elexus brand fonti — Figma spec bo'yicha hero + boshqa sahifalarda ishlatiladi.
@@ -158,6 +159,9 @@ export default async function LocaleLayout({ children, params }: LayoutProps) {
             <main className="min-h-screen">
               {children}
             </main>
+            {/* Firma rekvizitlari + Privacy/Data deletion havolalari — faqat
+                gilam-market.uz (Meta Business Verification va App Review uchun). */}
+            {!shop && <LegalRequisites locale={locale} />}
             <ToastContainer />
             {/* FixedLayout — Gilam Market'ning umumiy header/drawer/menu.
                 Tenant shop bo'lsa (masalan Elexus), tenant o'zining header +

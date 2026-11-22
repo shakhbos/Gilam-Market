@@ -4,7 +4,7 @@ import { SITE_URL } from '@/utils/seo';
 import type { PaginatedResponse, QrBaseProduct } from '@/types/api';
 
 const LOCALES = ['uz', 'ru', 'en'] as const;
-const BASE_ROUTES = ['', '/about', '/delivery', '/payment'] as const;
+const BASE_ROUTES = ['', '/about', '/delivery', '/payment', '/privacy', '/data-deletion'] as const;
 
 /**
  * Sitemap. Barcha statik sahifalar + katalogdagi barcha published mahsulotlar.
