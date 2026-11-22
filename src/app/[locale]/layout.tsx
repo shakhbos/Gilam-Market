@@ -30,6 +30,7 @@ const interTight = Inter_Tight({
 const GILAM_MARKET_METRIKA_ID = "114193355";
 /** Asosiy gilam-market.uz sayti (tenant emas) — GA4 Measurement ID. */
 const GILAM_MARKET_GA4_ID = "G-0HJSZE4J65";
+const FACEBOOK_DOMAIN_VERIFICATION = "jxmc6sp2txhhnqqh1qos1kd7dljobc";
 
 // Fallback ranglar — tenant shop primary/secondary ranglar yo'q bo'lsa
 const DEFAULT_PRIMARY = "#2299DD";
@@ -113,6 +114,8 @@ export async function generateMetadata({ params }: MetadataProps): Promise<Metad
         'max-snippet': -1,
       },
     },
+    // Meta Business — gilam-market.uz domen tasdig'i (tenant domenlariga emas).
+    other: shop ? undefined : { 'facebook-domain-verification': FACEBOOK_DOMAIN_VERIFICATION },
   };
 }
 
